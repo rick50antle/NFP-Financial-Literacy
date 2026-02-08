@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tutorial 1: Statement of Financial Position</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: #f5f1e8;
+      color: #5c4d3d;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: 700;
+    }
+
+    button {
+      font-family: 'Inter', sans-serif;
+    }
+
+    input, textarea {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const NFPTutorial1 = () => {
+      const [phase, setPhase] = useState('welcome');
+      const [devMode, setDevMode] = useState(false);
+      const [headerClickCount, setHeaderClickCount] = useState(0);
+      const [showGlossary, setShowGlossary] = useState(false);
+      const [hints, setHints] = useState({});
+      const [showTransparency, setShowTransparency] = useState(false);
+      const [answers, setAnswers] = useState({});
+      const [soundOn, setSoundOn] = useState(true);
+
+      const phaseOrder = ['welcome', 'phase1', 'phase2', 'phase3', 'phase4', 'phase5', 'complete'];
+
+      const colors = {
+        primary: '#00356b',
+        sand: '#f5f1e8',
+        earth: '#8b7355',
+        earthLight: '#d4c4a8',
+        earthDark: '#5c4d3d',
+        accent: '#c9a227',
+        clay: '#c4a574',
+        clayLight: '#e8dcc8',
+        clayDark: '#a08050',
+        success: '#22c55e',
+        successBg: '#f0fdf4',
+        warning: '#f59e0b',
+        warningBg: '#fffbeb',
+        error: '#dc2626',
+        errorBg: '#fef2f2',
+      };
+
+      const createAudioContext = () => new (window.AudioContext || window.webkitAudioContext)();
+
+      const playSuccessTone = () => {
+        if (!soundOn) return;
+        try {
+          const ctx = createAudioContext();
+          [523.25, 659.25, 783.99].forEach((freq, i) => {
+            const osc = ctx.createOscillator(), gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.value = freq; osc.type = 'sine';
+            const start = ctx.currentTime + i * 0.1;
+            gain.gain.setValueAtTime(0, start);
+            gain.gain.linearRampToValueAtTime(0.3, start + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.01, start + 0.15);
+            osc.start(start); osc.stop(start + 0.25);
+          });
+          setTimeout(() => ctx.close(), 600);
+        } catch(e) {}
+      };
+
+      const playSoftNope = () => {
+        if (!soundOn) return;
+        try {
+          const ctx = createAudioContext();
+          [400, 300].forEach((freq, i) => {
+            const osc = ctx.createOscillator(), gain = ctx.createGain();
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.frequency.value = freq; osc.type = 'sine';
+            const start = ctx.currentTime + i * 0.12;
+            gain.gain.setValueAtTime(0, start);
+            gain.gain.linearRampToValueAtTime(0.2, start + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.01, start + 0.12);
+            osc.start(start); osc.stop(start + 0.17);
+          });
+          setTimeout(() => ctx.close(), 400);
+        } catch(e) {}
+      };
+
+      const playBuzzer = () => {
+        if (!soundOn) return;
+        try {
+          const ctx = createAudioContext();
+          const osc = ctx.createOscillator(), gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.frequency.value = 150; osc.type = 'sawtooth';
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+          osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.35);
+          setTimeout(() => ctx.close(), 400);
+        } catch(e) {}
+      };
+
+      const playContinueClick = () => {
+        if (!soundOn) return;
+        try {
+          const ctx = createAudioContext();
+          const osc = ctx.createOscillator(), gain = ctx.createGain();
+          osc.connect(gain); gain.connect(ctx.destination);
+          osc.frequency.value = 600; osc.type = 'sine';
+          gain.gain.setValueAtTime(0, ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
+          osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.1);
+          setTimeout(() => ctx.close(), 150);
+        } catch(e) {}
+      };
+
+      const getHintCount = (questionId) => hints[questionId] || 0;
+      const addHint = (questionId) => {
+        const newHintCount = (hints[questionId] || 0) + 1;
+        setHints(prev => ({ ...prev, [questionId]: newHintCount }));
+        if (newHintCount === 1) playSoftNope();
+        else if (newHintCount === 2) playSoftNope();
+        else if (newHintCount === 3) playBuzzer();
+      };
+
+      const handleHeaderClick = () => {
+        const newCount = headerClickCount + 1;
+        setHeaderClickCount(newCount);
+        if (newCount >= 3) {
+          setDevMode(!devMode);
+          setHeaderClickCount(0);
+        }
+      };
+
+      const handleRestart = () => {
+        setPhase('welcome');
+        setHints({});
+        setAnswers({});
+        setHeaderClickCount(0);
+        playContinueClick();
+      };
+
+      const getProgressPercentage = () => {
+        const index = phaseOrder.indexOf(phase);
+        return index >= 0 ? ((index + 1) / phaseOrder.length) * 100 : 100;
+      };
+
+      const Header = () => (
+        <div style={{ backgroundColor: colors.primary, padding: '20px', color: 'white' }}>
+          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <h1
+              onClick={handleHeaderClick}
+              style={{ margin: '0 0 8px 0', fontSize: '28px', cursor: 'pointer', userSelect: 'none' }}
+            >
+              Tutorial 1: Statement of Financial Position
+            </h1>
+            <p style={{ margin: '0 0 15px 0', fontSize: '14px', opacity: 0.9 }}>
+              Yale School of Management • NFP Financial Literacy
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: devMode ? '15px' : '0' }}>
+              <div style={{ flex: 1, marginRight: '20px' }}>
+                <div style={{ height: '8px', backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      height: '100%',
+                      backgroundColor: colors.accent,
+                      width: `${getProgressPercentage()}%`,
+                      transition: 'width 0.3s ease',
+                    }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={() => setShowGlossary(!showGlossary)}
+                  style={{
+                    background: colors.accent,
+                    border: 'none',
+                    color: colors.primary,
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '20px',
+                  }}
+                >
+                  📖
+                </button>
+                <button
+                  onClick={handleRestart}
+                  style={{
+                    background: colors.accent,
+                    border: 'none',
+                    color: colors.primary,
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '20px',
+                  }}
+                >
+                  ↺
+                </button>
+              </div>
+            </div>
+            {devMode && (
+              <div style={{ marginTop: '10px', padding: '10px', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '6px' }}>
+                <p style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: 'bold' }}>Dev Mode: Skip to phase</p>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                  {phaseOrder.map(p => (
+                    <button
+                      key={p}
+                      onClick={() => { setPhase(p); setHints({}); setAnswers({}); }}
+                      style={{
+                        padding: '6px 12px',
+                        fontSize: '11px',
+                        fontWeight: 'bold',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        backgroundColor: p === phase ? colors.accent : 'rgba(255,255,255,0.2)',
+                        color: p === phase ? colors.primary : 'white',
+                      }}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+
+      const ContinueButton = ({ onClick, label = 'Continue' }) => (
+        <button
+          onClick={() => { playContinueClick(); onClick(); }}
+          style={{
+            backgroundColor: colors.accent,
+            color: colors.primary,
+            border: 'none',
+            padding: '12px 28px',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            borderRadius: '6px',
+            cursor: 'pointer',
+            marginTop: '20px',
+          }}
+        >
+          {label} →
+        </button>
+      );
+
+      const HintButton = ({ questionId, hints: hintTexts, explanation }) => {
+        const hintCount = getHintCount(questionId);
+        if (hintCount >= 3) {
+          return (
+            <div style={{ marginTop: '12px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px', color: colors.success, fontSize: '13px' }}>
+              {explanation}
+            </div>
+          );
+        }
+        return (
+          <button
+            onClick={() => addHint(questionId)}
+            style={{
+              marginTop: '12px',
+              backgroundColor: hintCount >= 2 ? colors.warningBg : 'transparent',
+              color: hintCount >= 2 ? colors.warning : colors.clay,
+              border: `2px solid ${hintCount >= 2 ? colors.warning : colors.earthLight}`,
+              padding: '8px 16px',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: 'bold',
+            }}
+          >
+            Hint {hintCount + 1}/3
+          </button>
+        );
+      };
+
+      const Q1Answer = () => {
+        const [answer, setAnswer] = useState('');
+        const [answered, setAnswered] = useState(false);
+
+        const normalizeAnswer = (str) => str.replace(/[,\s]/g, '').trim();
+        const isCorrect = normalizeAnswer(answer) === '106388737';
+
+        const handleSubmit = () => {
+          if (isCorrect) {
+            playSuccessTone();
+            setAnswered(true);
+          } else {
+            addHint('q1');
+          }
+        };
+
+        if (answered) {
+          return (
+            <>
+              <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct! $106,388,737</p>
+                <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
+                  Net Assets is the DEFINITIONAL difference between recorded assets and recorded liabilities. It's not a pool of money you can see or touch — it's a mathematical residual that tells you what's left over after you account for what you owe.
+                </p>
+              </div>
+              <ContinueButton onClick={() => setPhase('phase2')} label="Next Phase" />
+            </>
+          );
+        }
+
+        return (
+          <>
+            <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
+              <input
+                type="text"
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !answered) handleSubmit(); }}
+                placeholder="Enter your answer"
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  border: `2px solid ${colors.earthLight}`,
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                }}
+              />
+              <button
+                onClick={handleSubmit}
+                style={{
+                  backgroundColor: colors.accent,
+                  color: colors.primary,
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                }}
+              >
+                Check
+              </button>
+            </div>
+            <HintButton
+              questionId="q1"
+              hints={[
+                'The accounting identity says Assets minus Liabilities equals Net Assets. Subtract $6,387,331 from $112,776,068.',
+                '112,776,068 − 6,387,331 = ?',
+              ]}
+              explanation="Net Assets is the DEFINITIONAL difference between recorded assets and recorded liabilities. It's $106,388,737 — not a pool of money, but a mathematical residual."
+            />
+          </>
+        );
+      };
+
+      const Q2Answer = () => {
+        const [answered, setAnswered] = useState(null);
+
+        const handleAnswer = (choice) => {
+          if (choice === 'B') {
+            playSuccessTone();
+            setAnswered(true);
+          } else {
+            addHint('q2');
+          }
+        };
+
+        if (answered) {
+          return (
+            <>
+              <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct!</p>
+                <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
+                  Unlike for-profit equities, Net Assets doesn't represent ownership. It's a DEFINITIONAL residual — the name given to the difference between recorded assets and liabilities. It tracks whether contributions came with donor restrictions.
+                </p>
+              </div>
+              <ContinueButton onClick={() => setPhase('phase3')} label="Next Phase" />
+            </>
+          );
+        }
+
+        return (
+          <>
+            <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                { choice: 'A', text: 'Ownership stake (like for-profit equities)' },
+                { choice: 'B', text: 'A residual that tracks donor restriction status' },
+              ].map(opt => (
+                <button
+                  key={opt.choice}
+                  onClick={() => handleAnswer(opt.choice)}
+                  style={{
+                    padding: '12px',
+                    border: `2px solid ${colors.earthLight}`,
+                    borderRadius: '6px',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    fontSize: '14px',
+                  }}
+                >
+                  <span style={{ fontWeight: 'bold', color: colors.primary }}>{opt.choice}. </span>
+                  {opt.text}
+                </button>
+              ))}
+            </div>
+            <HintButton
+              questionId="q2"
+              hints={[
+                'Think about what makes nonprofits different from for-profits. Who are the "owners"?',
+                'Nonprofits have no owners. So Net Assets can\'t represent ownership. What DOES it track?',
+              ]}
+              explanation="Unlike for-profit equities, Net Assets doesn't represent ownership. It's a DEFINITIONAL residual — the name given to the difference between recorded assets and liabilities. It tracks whether contributions came with donor restrictions."
+            />
+          </>
+        );
+      };
+
+      const Q3Answer = () => {
+        const [answer, setAnswer] = useState('');
+        const [answered, setAnswered] = useState(false);
+
+        const isCorrect = [5, 6, 5.7].includes(Number(answer));
+
+        const handleSubmit = () => {
+          if (isCorrect) {
+            playSuccessTone();
+            setAnswered(true);
+          } else {
+            addHint('q3');
+          }
+        };
+
+        if (answered) {
+          return (
+            <>
+              <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct! About 6%</p>
+                <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
+                  Only about 6% of OHS's assets are financed by liabilities. That means 94% is funded by net assets — contributions and accumulated surpluses over the organization's lifetime. This is common for established nonprofits.
+                </p>
+              </div>
+              <ContinueButton onClick={() => setPhase('phase4')} label="Next Phase" />
+            </>
+          );
+        }
+
+        return (
+          <>
+            <div style={{ marginTop: '16px', display: 'flex', gap: '8px' }}>
+              <input
+                type="text"
+                value={answer}
+                onChange={(e) => setAnswer(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter' && !answered) handleSubmit(); }}
+                placeholder="Enter percentage (5-6)"
+                style={{
+                  flex: 1,
+                  padding: '10px',
+                  border: `2px solid ${colors.earthLight}`,
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                }}
+              />
+              <button
+                onClick={handleSubmit}
+                style={{
+                  backgroundColor: colors.accent,
+                  color: colors.primary,
+                  border: 'none',
+                  padding: '10px 20px',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                }}
+              >
+                Check
+              </button>
+            </div>
+            <HintButton
+              questionId="q3"
+              hints={[
+                'Divide total liabilities by total assets and multiply by 100.',
+                '$6,387,331 ÷ $112,776,068 × 100 = ?',
+              ]}
+              explanation="Only about 6% of OHS's assets are financed by liabilities. That means 94% is funded by net assets — contributions and accumulated surpluses over the organization's lifetime. This is common for established nonprofits."
+            />
+          </>
+        );
+      };
+
+      const Q4Answer = () => {
+        const [answered, setAnswered] = useState(null);
+
+        const handleAnswer = (choice) => {
+          if (choice === 'B') {
+            playSuccessTone();
+            setAnswered(true);
+          } else {
+            addHint('q4');
+          }
+        };
+
+        if (answered) {
+          return (
+            <>
+              <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct!</p>
+                <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
+                  This is one of the most important things to understand about nonprofit financial statements. Net Assets Without Donor Restrictions tells you these contributions didn't come with donor strings attached. But $62.6 million of that is tied up in buildings and land — you can't spend buildings. The net asset category tells you about RESTRICTION STATUS, not LIQUIDITY.
+                </p>
+              </div>
+              <ContinueButton onClick={() => setPhase('phase5')} label="Next Phase" />
+            </>
+          );
+        }
+
+        return (
+          <>
+            <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {[
+                { choice: 'A', text: 'Yes — "without restrictions" means available' },
+                { choice: 'B', text: 'No — the category tracks restriction STATUS, not spending capacity' },
+              ].map(opt => (
+                <button
+                  key={opt.choice}
+                  onClick={() => handleAnswer(opt.choice)}
+                  style={{
+                    padding: '12px',
+                    border: `2px solid ${colors.earthLight}`,
+                    borderRadius: '6px',
+                    backgroundColor: 'transparent',
+                    cursor: 'pointer',
+                    textAlign: 'left',
+                    fontSize: '14px',
+                  }}
+                >
+                  <span style={{ fontWeight: 'bold', color: colors.primary }}>{opt.choice}. </span>
+                  {opt.text}
+                </button>
+              ))}
+            </div>
+            <HintButton
+              questionId="q4"
+              hints={[
+                'Think about what kind of assets might be included in that $87.3 million. Could some be illiquid?',
+                'OHS has $62.6 million in buildings and land. Those are part of net assets without donor restrictions, but can you spend a building?',
+              ]}
+              explanation="This is one of the most important things to understand about nonprofit financial statements. Net Assets Without Donor Restrictions tells you these contributions didn't come with donor strings attached. But $62.6 million of that is tied up in buildings and land — you can't spend buildings. The net asset category tells you about RESTRICTION STATUS, not LIQUIDITY."
+            />
+          </>
+        );
+      };
+
+      const Q5Answer = () => {
+        const [answer, setAnswer] = useState('');
+        const [answered, setAnswered] = useState(false);
+
+        const handleSubmit = () => {
+          if (answer.trim().length > 20) {
+            playSuccessTone();
+            setAnswered(true);
+          } else {
+            addHint('q5');
+          }
+        };
+
+        if (answered) {
+          return (
+            <>
+              <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Great thinking!</p>
+                <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
+                  Accounting is a human-created information system, not a mirror of economic reality. OHS's recorded assets of $112.8 million exclude valuable things like its volunteer network, brand reputation, donor relationships, and staff expertise — all real economic resources that can't be reliably quantified under accounting rules.
+                </p>
+              </div>
+              <ContinueButton onClick={() => setPhase('complete')} label="See Results" />
+            </>
+          );
+        }
+
+        return (
+          <>
+            <textarea
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && !answered) { e.preventDefault(); handleSubmit(); } }}
+              placeholder="Describe a valuable resource and explain why it's excluded..."
+              style={{
+                marginTop: '16px',
+                width: '100%',
+                minHeight: '100px',
+                padding: '10px',
+                border: `2px solid ${colors.earthLight}`,
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontFamily: 'inherit',
+                boxSizing: 'border-box',
+              }}
+            />
+            <button
+              onClick={handleSubmit}
+              style={{
+                marginTop: '12px',
+                backgroundColor: colors.accent,
+                color: colors.primary,
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+              }}
+            >
+              Submit
+            </button>
+            <HintButton
+              questionId="q5"
+              hints={[
+                'Consider intangible resources: volunteer networks, reputation, community relationships.',
+                'These resources create value but can\'t be reliably quantified using accounting methods.',
+              ]}
+              explanation="Accounting is a human-created information system, not a mirror of economic reality. OHS's recorded assets of $112.8 million exclude valuable things like its volunteer network, brand reputation, donor relationships, and staff expertise — all real economic resources that can't be reliably quantified under accounting rules."
+            />
+          </>
+        );
+      };
+
+      const Glossary = () => (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+        }}>
+          <div style={{
+            backgroundColor: colors.sand,
+            borderRadius: '12px',
+            padding: '30px',
+            maxWidth: '600px',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+          }}>
+            <h2 style={{ margin: '0 0 20px 0', color: colors.primary }}>Glossary</h2>
+            {[
+              { term: 'Accounting Identity', def: 'Assets − Liabilities = Net Assets (for nonprofits). A framework for organizing financial information, not a formula.' },
+              { term: 'Asset', def: 'The present RIGHT to an economic benefit — not necessarily a physical thing.' },
+              { term: 'Liability', def: 'A present OBLIGATION to transfer an economic benefit to another party.' },
+              { term: 'Net Assets', def: 'The DEFINITIONAL difference between recorded assets and liabilities. For nonprofits, tracks the status of donor restrictions.' },
+              { term: 'Without Donor Restrictions', def: 'Net assets from contributions that either had no donor restrictions or had restrictions that have been satisfied.' },
+              { term: 'With Donor Restrictions', def: 'Net assets from contributions with donor-imposed restrictions that have NOT yet been met.' },
+              { term: 'Statement of Financial Position', def: 'The nonprofit equivalent of a balance sheet — shows assets, liabilities, and net assets at a point in time.' },
+            ].map((item, i) => (
+              <div key={i} style={{ marginBottom: '15px', paddingBottom: '15px', borderBottom: `1px solid ${colors.earthLight}` }}>
+                <h4 style={{ margin: '0 0 6px 0', color: colors.primary }}>{item.term}</h4>
+                <p style={{ margin: 0, fontSize: '13px', color: colors.earthDark }}>{item.def}</p>
+              </div>
+            ))}
+            <button
+              onClick={() => setShowGlossary(false)}
+              style={{
+                marginTop: '20px',
+                backgroundColor: colors.primary,
+                color: 'white',
+                border: 'none',
+                padding: '10px 20px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      );
+
+      const SoundToggle = () => (
+        <button
+            onClick={() => setSoundOn(!soundOn)}
+            style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: colors.sand,
+                border: 'none',
+                padding: '8px',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                zIndex: 100,
+            }}
+            title={soundOn ? "Sound On" : "Sound Off"}
+        >
+            {soundOn ? '🔊' : '🔇'}
+        </button>
+      );
+
+      const Container = ({ children }) => (
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
+          {children}
+        </div>
+      );
+
+      return (
+        <div style={{ backgroundColor: colors.sand, minHeight: '100vh', position: 'relative' }}>
+          <SoundToggle />
+          <Header />
+
+          {showGlossary && <Glossary />}
+
+          {phase === 'welcome' && (
+            <Container>
+              <h2 style={{ color: colors.primary, marginBottom: '20px' }}>Reading the Statement of Financial Position</h2>
+              <p style={{ fontSize: '16px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '24px' }}>
+                The Statement of Financial Position is the nonprofit equivalent of a balance sheet. Like a balance sheet in for-profit accounting, it shows what an organization owns (assets), what it owes (liabilities), and what's left over (net assets) at a point in time. Rick2.0 will help you bridge from accounting concepts you already know to the nonprofit world.
+              </p>
+
+              <div style={{ backgroundColor: 'white', border: `2px solid ${colors.earthLight}`, borderRadius: '8px', padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{ margin: '0 0 12px 0', color: colors.primary, fontSize: '16px' }}>What You'll Explore</h3>
+                <ul style={{ margin: '0', paddingLeft: '20px', color: colors.earthDark, fontSize: '14px', lineHeight: '1.8' }}>
+                  <li>How the accounting identity works in nonprofits (and why Net Assets is a residual, not a pool of money)</li>
+                  <li>The difference between donations WITH strings attached and donations WITHOUT strings</li>
+                  <li>Why "no donor restrictions" doesn't mean "money available to spend"</li>
+                  <li>What financial statements show and what they leave out</li>
+                </ul>
+              </div>
+
+              <div style={{ backgroundColor: colors.warningBg, border: `2px solid ${colors.warning}`, borderRadius: '8px', padding: '16px', marginBottom: '24px' }}>
+                <div
+                  onClick={() => setShowTransparency(!showTransparency)}
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <h4 style={{ margin: '0', color: colors.warning, fontSize: '14px', fontWeight: 'bold' }}>
+                    AI Transparency Note
+                  </h4>
+                  <span style={{ fontSize: '18px', transform: showTransparency ? 'rotate(180deg)' : '', transition: 'transform 0.2s', display: 'inline-block' }}>
+                    ⌄
+                  </span>
+                </div>
+                {showTransparency && (
+                  <p style={{ margin: '12px 0 0 0', fontSize: '13px', color: colors.earthDark, lineHeight: '1.6' }}>
+                    This tutorial is powered by AI. Rick2.0 is an AI tutor built on Claude by Anthropic. While great care has been taken to ensure accuracy, AI systems can make mistakes. This is a learning aid, not a replacement for professional accounting advice. Verify important concepts with your organization's auditors or financial advisors.
+                  </p>
+                )}
+              </div>
+
+              <ContinueButton onClick={() => setPhase('phase1')} label="Begin Tutorial" />
+            </Container>
+          )}
+
+          {phase === 'phase1' && (
+            <Container>
+              <h2 style={{ color: colors.primary, marginBottom: '20px' }}>The Accounting Identity</h2>
+              <p style={{ fontSize: '16px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '16px' }}>
+                In for-profit accounting, you know: <strong>Assets − Liabilities = Equities</strong>
+              </p>
+              <p style={{ fontSize: '16px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '24px' }}>
+                In nonprofits, it's the same logic, but different terminology: <strong>Assets − Liabilities = Net Assets</strong>
+              </p>
+
+              <div style={{ backgroundColor: 'white', border: `2px solid ${colors.accent}`, borderRadius: '8px', padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{ margin: '0 0 16px 0', color: colors.primary, fontSize: '16px' }}>Oregon Humane Society (OHS) — FY2024</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <p style={{ margin: '0 0 6px 0', fontSize: '13px', color: colors.earthDark }}>Total Assets</p>
+                    <p style={{ margin: '0', fontSize: '20px', fontWeight: 'bold', color: colors.primary }}>$112,776,068</p>
+                  </div>
+                  <div>
+                    <p style={{ margin: '0 0 6px 0', fontSize: '13px', color: colors.earthDark }}>Total Liabilities</p>
+                    <p style={{ margin: '0', fontSize: '20px', fontWeight: 'bold', color: colors.primary }}>$6,387,331</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: colors.clayLight, border: `2px solid ${colors.clay}`, borderRadius: '8px', padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{ margin: '0 0 12px 0', color: colors.primary, fontSize: '16px' }}>Your Question</h3>
+                <p style={{ margin: '0 0 16px 0', fontSize: '15px', color: colors.earthDark }}>
+                  Using the accounting identity, calculate OHS's total Net Assets. (You can include or exclude commas.)
+                </p>
+                <Q1Answer />
+              </div>
+            </Container>
+          )}
+
+          {phase === 'phase2' && (
+            <Container>
+              <h2 style={{ color: colors.primary, marginBottom: '20px' }}>What Net Assets Really Represents</h2>
+              <p style={{ fontSize: '16px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '16px' }}>
+                In for-profit accounting, Equities represent the ownership claims on the business — the definitional difference between recorded assets and recorded liabilities.
+              </p>
+              <p style={{ fontSize: '16px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '24px' }}>
+                In a nonprofit, there are no owners — no shareholders, no proprietor. So Net Assets can't represent ownership. Instead, it tracks something different: the status of donor restrictions on contributions.
+              </p>
+
+              <div style={{ backgroundColor: colors.clayLight, border: `2px solid ${colors.clay}`, borderRadius: '8px', padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{ margin: '0 0 12px 0', color: colors.primary, fontSize: '16px' }}>Your Question</h3>
+                <p style={{ margin: '0 0 16px 0', fontSize: '15px', color: colors.earthDark }}>
+                  Net Assets in a nonprofit is most like which concept from for-profit accounting?
+                </p>
+                <Q2Answer />
+              </div>
+            </Container>
+          )}
+
+          {phase === 'phase3' && (
+            <Container>
+              <h2 style={{ color: colors.primary, marginBottom: '20px' }}>Reading OHS's Full Statement</h2>
+              <p style={{ fontSize: '16px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '24px' }}>
+                Here's the complete Statement of Financial Position for Oregon Humane Society (FY2024):
+              </p>
+
+              <div style={{ backgroundColor: 'white', border: `2px solid ${colors.earthLight}`, borderRadius: '8px', padding: '20px', marginBottom: '24px', fontSize: '14px' }}>
+                <h3 style={{ margin: '0 0 16px 0', color: colors.primary }}>Assets</h3>
+                <p style={{ margin: '0', color: colors.earthDark }}>Cash and cash equivalents: $8,234,000</p>
+                <p style={{ margin: '0', color: colors.earthDark }}>Investments: $32,965,900</p>
+                <p style={{ margin: '0', color: colors.earthDark }}>Pledges and grants receivable: $1,203,167</p>
+                <p style={{ margin: '0', color: colors.earthDark }}>Property, plant, and equipment, net: $62,576,168</p>
+                <p style={{ margin: '8px 0 0 0', fontWeight: 'bold', color: colors.primary }}>Total Assets: $112,776,068</p>
+
+                <h3 style={{ margin: '20px 0 16px 0', color: colors.primary }}>Liabilities</h3>
+                <p style={{ margin: '0', color: colors.earthDark }}>Accounts payable: $1,892,144</p>
+                <p style={{ margin: '0', color: colors.earthDark }}>Accrued expenses: $2,150,055</p>
+                <p style={{ margin: '0', color: colors.earthDark }}>Deferred revenue: $2,345,132</p>
+                <p style={{ margin: '8px 0 0 0', fontWeight: 'bold', color: colors.primary }}>Total Liabilities: $6,387,331</p>
+
+                <h3 style={{ margin: '20px 0 16px 0', color: colors.primary }}>Net Assets</h3>
+                <p style={{ margin: '0', color: colors.earthDark }}>Without Donor Restrictions: $87,289,882</p>
+                <p style={{ margin: '0', color: colors.earthDark }}>With Donor Restrictions: $19,098,855</p>
+                <p style={{ margin: '8px 0 0 0', fontWeight: 'bold', color: colors.primary }}>Total Net Assets: $106,388,737</p>
+              </div>
+
+              <div style={{ backgroundColor: colors.clayLight, border: `2px solid ${colors.clay}`, borderRadius: '8px', padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{ margin: '0 0 12px 0', color: colors.primary, fontSize: '16px' }}>Your Question</h3>
+                <p style={{ margin: '0 0 16px 0', fontSize: '15px', color: colors.earthDark }}>
+                  What percentage of OHS's total assets are financed by liabilities? (Round to the nearest whole number)
+                </p>
+                <Q3Answer />
+              </div>
+            </Container>
+          )}
+
+          {phase === 'phase4' && (
+            <Container>
+              <h2 style={{ color: colors.primary, marginBottom: '20px' }}>The Two Net Asset Categories</h2>
+              <p style={{ fontSize: '16px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '16px' }}>
+                Net Assets is divided into two categories that track whether donations came with donor-imposed restrictions:
+              </p>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                <div style={{ backgroundColor: 'white', border: `2px solid ${colors.earthLight}`, borderRadius: '8px', padding: '16px' }}>
+                  <h4 style={{ margin: '0 0 12px 0', color: colors.primary }}>Without Donor Restrictions</h4>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 'bold', color: colors.success }}>$87,289,882</p>
+                  <p style={{ margin: '0', fontSize: '13px', color: colors.earthDark }}>Contributions with no strings attached (or where restrictions have been met)</p>
+                  <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: colors.earthDark, fontStyle: 'italic' }}>82% of total Net Assets</p>
+                </div>
+                <div style={{ backgroundColor: 'white', border: `2px solid ${colors.earthLight}`, borderRadius: '8px', padding: '16px' }}>
+                  <h4 style={{ margin: '0 0 12px 0', color: colors.primary }}>With Donor Restrictions</h4>
+                  <p style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 'bold', color: colors.warning }}>$19,098,855</p>
+                  <p style={{ margin: '0', fontSize: '13px', color: colors.earthDark }}>Contributions with unmet donor-imposed restrictions</p>
+                  <p style={{ margin: '8px 0 0 0', fontSize: '12px', color: colors.earthDark, fontStyle: 'italic' }}>18% of total Net Assets</p>
+                </div>
+              </div>
+
+              <div style={{ backgroundColor: colors.warningBg, border: `2px solid ${colors.warning}`, borderRadius: '8px', padding: '16px', marginBottom: '24px' }}>
+                <p style={{ margin: '0', fontSize: '14px', color: colors.earthDark }}>
+                  <strong>Important:</strong> These categories describe the RESTRICTION STATUS of net assets, not how much money is available to spend. We'll see why next.
+                </p>
+              </div>
+
+              <div style={{ backgroundColor: colors.clayLight, border: `2px solid ${colors.clay}`, borderRadius: '8px', padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{ margin: '0 0 12px 0', color: colors.primary, fontSize: '16px' }}>Your Question</h3>
+                <p style={{ margin: '0 0 16px 0', fontSize: '15px', color: colors.earthDark }}>
+                  OHS shows $87.3 million in Net Assets Without Donor Restrictions. Does this mean OHS has $87.3 million available to spend however it wants?
+                </p>
+                <Q4Answer />
+              </div>
+            </Container>
+          )}
+
+          {phase === 'phase5' && (
+            <Container>
+              <h2 style={{ color: colors.primary, marginBottom: '20px' }}>Accounting Representations vs. Reality</h2>
+              <p style={{ fontSize: '16px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '24px' }}>
+                The Statement of Financial Position shows RECORDED assets — things accountants can reliably quantify using accounting rules. But it excludes valuable resources that are hard to quantify: volunteer networks, brand reputation, donor relationships, trained staff expertise, community goodwill.
+              </p>
+
+              <p style={{ fontSize: '16px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '24px' }}>
+                This isn't a weakness in the financial statements. It's a feature: accounting is built on verifiable quantification. But it means the financial statements tell only part of the story about an organization's resources.
+              </p>
+
+              <div style={{ backgroundColor: colors.clayLight, border: `2px solid ${colors.clay}`, borderRadius: '8px', padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{ margin: '0 0 12px 0', color: colors.primary, fontSize: '16px' }}>Your Question</h3>
+                <p style={{ margin: '0 0 16px 0', fontSize: '15px', color: colors.earthDark }}>
+                  OHS's financial statements show $112.8 million in recorded assets. Name one valuable resource OHS likely has that does NOT appear on this statement, and explain why it's excluded.
+                </p>
+                <Q5Answer />
+              </div>
+            </Container>
+          )}
+
+          {phase === 'complete' && (
+            <Container>
+              <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+                <div style={{ fontSize: '64px', marginBottom: '20px' }}>🏆</div>
+                <h2 style={{ color: colors.primary, margin: '0 0 12px 0' }}>Tutorial Complete!</h2>
+                <p style={{ color: colors.earthDark, fontSize: '16px' }}>You've mastered the fundamentals of the Statement of Financial Position.</p>
+              </div>
+
+              <div style={{ backgroundColor: 'white', border: `2px solid ${colors.earthLight}`, borderRadius: '8px', padding: '24px', marginBottom: '24px' }}>
+                <h3 style={{ margin: '0 0 16px 0', color: colors.primary }}>What You Discovered</h3>
+                <ul style={{ margin: '0', paddingLeft: '20px', color: colors.earthDark, fontSize: '15px', lineHeight: '1.8' }}>
+                  <li>✓ The accounting identity — Assets minus Liabilities equals Net Assets</li>
+                  <li>✓ Net Assets is a DEFINITIONAL residual, not ownership equities</li>
+                  <li>✓ The two net asset categories track donor restriction status, not spending capacity</li>
+                  <li>✓ "Without Donor Restrictions" does NOT mean "available to spend"</li>
+                  <li>✓ Financial statements show recorded amounts, not the full economic picture</li>
+                </ul>
+              </div>
+
+              <div style={{ backgroundColor: '#e8d9f0', border: `2px solid #9370db`, borderRadius: '8px', padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{ margin: '0 0 12px 0', color: colors.primary }}>The Deeper Point</h3>
+                <p style={{ margin: '0', color: colors.earthDark, fontSize: '14px', lineHeight: '1.6' }}>
+                  The Statement of Financial Position shows only recorded assets — amounts accountants can verify using established rules. But an organization's true economic value includes invaluable resources that never appear on the statement: volunteer expertise, community trust, donor relationships, brand reputation, and institutional knowledge. Understanding what IS on the statement is essential. Understanding what IS NOT on it is equally important.
+                </p>
+              </div>
+
+              <div style={{ backgroundColor: colors.successBg, border: `2px solid ${colors.success}`, borderRadius: '8px', padding: '20px', marginBottom: '24px' }}>
+                <h3 style={{ margin: '0 0 12px 0', color: colors.success, fontSize: '16px' }}>Coming Next</h3>
+                <p style={{ margin: '0 0 16px 0', color: colors.earthDark, fontSize: '14px', lineHeight: '1.6' }}>
+                  <strong>Tutorial 2 — Net Asset Categories:</strong> We'll dig deeper into what the subcategories within Net Assets actually tell you and why liquidity matters.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => window.location.href = 'NFP-Tutorial-2-Net-Asset-Categories.html'}
+                  style={{
+                    backgroundColor: colors.accent,
+                    color: colors.primary,
+                    border: 'none',
+                    padding: '12px 28px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Next Tutorial →
+                </button>
+                <button
+                  onClick={handleRestart}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: colors.primary,
+                    border: `2px solid ${colors.earthLight}`,
+                    padding: '10px 26px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  ↺ Restart
+                </button>
+              </div>
+            </Container>
+          )}
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<NFPTutorial1 />);
+  </script>
+</body>
+</html>

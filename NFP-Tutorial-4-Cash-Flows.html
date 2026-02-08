@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NFP Tutorial 4: Statement of Cash Flows</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    #root {
+      min-height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const NFPTutorial4 = () => {
+      const colors = {
+        primary: '#00356b',
+        sand: '#f5f1e8',
+        earth: '#8b7355',
+        earthLight: '#d4c4a8',
+        earthDark: '#5c4d3d',
+        accent: '#c9a227',
+        clay: '#c4a574',
+        clayLight: '#e8dcc8',
+        clayDark: '#a08050',
+        success: '#22c55e',
+        successBg: '#f0fdf4',
+        warning: '#f59e0b',
+        warningBg: '#fffbeb',
+        error: '#dc2626',
+        errorBg: '#fef2f2',
+      };
+
+      // Sound functions
+      const playSuccessTone = () => {
+        if (!soundOn) return;
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.frequency.value = 800;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.2);
+      };
+
+      const playSoftNope = () => {
+        if (!soundOn) return;
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.frequency.value = 300;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.15);
+      };
+
+      const playBuzzer = () => {
+        if (!soundOn) return;
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.frequency.value = 200;
+        osc.type = 'square';
+        gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.3);
+      };
+
+      const playContinueClick = () => {
+        if (!soundOn) return;
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        osc.frequency.value = 600;
+        osc.type = 'sine';
+        gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.1);
+      };
+
+      // State management
+      const [phase, setPhase] = useState('welcome');
+      const [devMode, setDevMode] = useState(false);
+      const [headerClickCount, setHeaderClickCount] = useState(0);
+      const [hintsUsed, setHintsUsed] = useState({});
+      const [answers, setAnswers] = useState({});
+      const [glossaryModalOpen, setGlossaryModalOpen] = useState(false);
+      const [aiTransparencyOpen, setAiTransparencyOpen] = useState(true);
+      const [soundOn, setSoundOn] = useState(true);
+
+      // Question data
+      const questions = {
+        q1: {
+          id: 'q1',
+          type: 'choice',
+          question: 'Under the indirect method, what is the STARTING point of the Statement of Cash Flows?',
+          options: [
+            'Total cash received during the period',
+            'Change in total net assets from the Statement of Activities',
+          ],
+          correct: 1,
+          hints: [
+            'The indirect method is a RECONCILIATION. It starts from one number and adjusts to arrive at another.',
+            'It starts with the bottom line of the Statement of Activities — the change in net assets — and reconciles to the change in cash.',
+          ],
+          explanation:
+            'The indirect method starts with the change in net assets ($4,011,032 for OHS) and adjusts for items that affected net assets but didn\'t involve cash — depreciation, changes in receivables, changes in payables — to arrive at the change in cash. It\'s a reconciliation between the accrual-based Statement of Activities and the cash-based change in the bank account.',
+        },
+        q2: {
+          id: 'q2',
+          type: 'choice',
+          question:
+            'OHS reports depreciation expense of $3.2 million. On the cash flow statement (indirect method), depreciation is ADDED BACK to the change in net assets. Why?',
+          options: [
+            'Because depreciation was a cash expense that needs to be counted twice',
+            'Because depreciation reduced net assets but didn\'t require any cash outflow',
+          ],
+          correct: 1,
+          hints: [
+            'Did OHS write a check for depreciation? Did cash leave the organization when depreciation was recorded?',
+            'Depreciation is an accounting allocation of past capital spending over time. It reduces net assets on the Statement of Activities but no cash moves.',
+          ],
+          explanation:
+            'Depreciation allocates the cost of buildings and equipment over their useful lives. It reduces net assets on the Statement of Activities (it\'s an expense), but it doesn\'t involve any cash outflow — the cash was spent years ago when the assets were purchased. So we add it back to reconcile from the change in net assets to the actual change in cash.',
+        },
+        q3: {
+          id: 'q3',
+          type: 'numeric',
+          question: 'OHS\'s beginning cash balance was $4,432,538. The net change in cash was negative $500,244. What is the ending cash balance?',
+          correct: '3932294',
+          correctAlternatives: ['3,932,294'],
+          hints: [
+            'Ending cash = Beginning cash + Net change in cash.',
+            '$4,432,538 + (−$500,244) = $4,432,538 − $500,244 = ?',
+          ],
+          explanation:
+            'Ending cash is $3,932,294. This number should match the cash reported on the Statement of Financial Position — another example of cross-statement articulation. The cash flow statement explains HOW you got from last year\'s cash balance to this year\'s.',
+        },
+        q4: {
+          id: 'q4',
+          type: 'choice',
+          question:
+            'OHS\'s net assets grew by $4.0 million, but cash decreased by $0.5 million. Which section of the cash flow statement primarily explains this gap?',
+          options: [
+            'Operating activities — the organization spent more cash on operations than it earned',
+            'Investing activities — OHS used $7.8 million for property and equipment purchases',
+          ],
+          correct: 1,
+          hints: [
+            'Operating cash flow was actually POSITIVE ($5.5M). So operations generated cash. Where did the cash go?',
+            'Investing activities used $7.8 million — primarily capital spending on buildings and equipment.',
+          ],
+          explanation:
+            'OHS\'s operations actually generated $5.5 million in cash. But the organization spent $7.8 million on capital investments (buildings, equipment). That\'s where the cash went. Financing activities brought in $1.8 million (long-term restricted contributions). Net result: $5.5M − $7.8M + $1.8M = −$0.5M change in cash.',
+        },
+        q5: {
+          id: 'q5',
+          type: 'choice',
+          question:
+            'The Statement of Cash Flows uses TOTAL change in net assets as its starting point. Does it matter whether OHS\'s net assets are restricted or unrestricted for the cash flow statement?',
+          options: [
+            'Yes — restricted and unrestricted cash flows are reported separately',
+            'No — the cash flow statement operates at the total level, indifferent to restriction categories',
+          ],
+          correct: 1,
+          hints: [
+            'Cash is cash. Does a dollar of restricted cash flow differently through operations than an unrestricted dollar?',
+            'The indirect method starts with TOTAL change in net assets. It doesn\'t distinguish between restricted and unrestricted.',
+          ],
+          explanation:
+            'The cash flow statement operates at the total net assets level. It doesn\'t care whether contributions were restricted or unrestricted — it only tracks the movement of cash. Two organizations with identical total changes in net assets but very different restriction profiles would produce identical cash flow statements (all else equal).',
+        },
+      };
+
+      const glossary = [
+        {
+          term: 'Statement of Cash Flows',
+          definition: 'Reconciles the change in net assets to the change in cash, explaining why they differ.',
+        },
+        {
+          term: 'Indirect Method',
+          definition:
+            'Starts with change in net assets and adjusts for non-cash items to arrive at cash from operations.',
+        },
+        {
+          term: 'Operating Activities',
+          definition: 'Cash generated or used in the organization\'s core mission activities.',
+        },
+        {
+          term: 'Investing Activities',
+          definition: 'Cash used for or generated from buying/selling long-term assets and investments.',
+        },
+        {
+          term: 'Financing Activities',
+          definition:
+            'Cash from donor-restricted contributions for long-term purposes, plus borrowing and debt repayment.',
+        },
+        {
+          term: 'Depreciation',
+          definition:
+            'An accounting allocation of capital asset costs over time — reduces net assets but involves no cash outflow.',
+        },
+      ];
+
+      // Question rendering
+      const renderQuestion = (qKey) => {
+        const q = questions[qKey];
+        const answered = answers[qKey] !== undefined;
+        const isCorrect = answered && checkAnswer(q, answers[qKey]);
+
+        return (
+          <div style={{ marginBottom: '2rem' }} key={qKey}>
+            <div
+              style={{
+                backgroundColor: colors.clayLight,
+                padding: '1.5rem',
+                borderRadius: '8px',
+                marginBottom: '1rem',
+                borderLeft: `5px solid ${colors.accent}`,
+              }}
+            >
+              <p style={{ fontSize: '1.1rem', fontWeight: '600', color: colors.primary, margin: '0 0 1rem 0' }}>
+                {q.question}
+              </p>
+
+              {q.type === 'choice' && (
+                <div>
+                  {q.options.map((opt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleAnswer(qKey, idx)}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        padding: '0.75rem',
+                        marginBottom: '0.5rem',
+                        backgroundColor: answered && answers[qKey] === idx ? colors.accent : colors.sand,
+                        border: `2px solid ${answered && answers[qKey] === idx ? colors.earthDark : colors.earth}`,
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '1rem',
+                        textAlign: 'left',
+                        transition: 'all 0.2s',
+                      }}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {q.type === 'numeric' && (
+                <input
+                  type="text"
+                  placeholder="Enter your answer"
+                  value={answers[qKey] || ''}
+                  onChange={(e) => handleAnswer(qKey, e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && answers[qKey]) {
+                      handleAnswer(qKey, answers[qKey]);
+                    }
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '0.75rem',
+                    fontSize: '1rem',
+                    border: `2px solid ${colors.earth}`,
+                    borderRadius: '6px',
+                    marginBottom: '0.5rem',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              )}
+            </div>
+
+            {answered && (
+              <div
+                style={{
+                  padding: '1rem',
+                  backgroundColor: isCorrect ? colors.successBg : colors.errorBg,
+                  borderRadius: '6px',
+                  marginBottom: '1rem',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '0.75rem',
+                }}
+              >
+                <div style={{ marginTop: '0.25rem', fontSize: '1.5rem' }}>
+                  {isCorrect ? '✓' : '⚠'}
+                </div>
+                <div>
+                  <p
+                    style={{
+                      margin: '0 0 0.5rem 0',
+                      fontWeight: '600',
+                      color: isCorrect ? colors.success : colors.error,
+                    }}
+                  >
+                    {isCorrect ? 'Exactly right!' : 'Not quite.'}
+                  </p>
+                  <p style={{ margin: '0 0 0.5rem 0', color: colors.primary }}>
+                    {q.explanation}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {!answered && (
+              <div style={{ marginBottom: '1rem' }}>
+                {[0, 1, 2].map((hintIdx) => {
+                  const isAvailable = !hintsUsed[`${qKey}-${hintIdx}`];
+                  return (
+                    <button
+                      key={hintIdx}
+                      onClick={() => toggleHint(qKey, hintIdx)}
+                      disabled={!isAvailable}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        marginRight: '0.5rem',
+                        padding: '0.5rem 1rem',
+                        backgroundColor: isAvailable ? colors.sand : colors.earthLight,
+                        border: `1px solid ${colors.earth}`,
+                        borderRadius: '6px',
+                        cursor: isAvailable ? 'pointer' : 'default',
+                        fontSize: '0.9rem',
+                        color: colors.primary,
+                        opacity: isAvailable ? 1 : 0.6,
+                      }}
+                    >
+                      ❓ Hint {hintIdx + 1}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
+            {hintsUsed[`${qKey}-0`] && q.hints[0] && (
+              <div
+                style={{
+                  padding: '0.75rem',
+                  backgroundColor: colors.warningBg,
+                  borderLeft: `4px solid ${colors.warning}`,
+                  borderRadius: '4px',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.95rem',
+                  color: colors.primary,
+                }}
+              >
+                {q.hints[0]}
+              </div>
+            )}
+            {hintsUsed[`${qKey}-1`] && q.hints[1] && (
+              <div
+                style={{
+                  padding: '0.75rem',
+                  backgroundColor: colors.warningBg,
+                  borderLeft: `4px solid ${colors.warning}`,
+                  borderRadius: '4px',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.95rem',
+                  color: colors.primary,
+                }}
+              >
+                {q.hints[1]}
+              </div>
+            )}
+            {hintsUsed[`${qKey}-2`] && !answered && (
+              <div
+                style={{
+                  padding: '0.75rem',
+                  backgroundColor: colors.errorBg,
+                  borderLeft: `4px solid ${colors.error}`,
+                  borderRadius: '4px',
+                  marginBottom: '0.5rem',
+                  fontSize: '0.95rem',
+                  color: colors.primary,
+                  fontWeight: '600',
+                }}
+              >
+                The answer is: <strong>{q.type === 'choice' ? q.options[q.correct] : q.correct}</strong>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      const checkAnswer = (q, answer) => {
+        if (q.type === 'choice') {
+          return answer === q.correct;
+        } else if (q.type === 'numeric') {
+          const normalized = String(answer).replace(/,/g, '').trim();
+          return normalized === q.correct || q.correctAlternatives?.includes(normalized);
+        }
+        return false;
+      };
+
+      const handleAnswer = (qKey, value) => {
+        setAnswers({ ...answers, [qKey]: value });
+        const q = questions[qKey];
+        if (checkAnswer(q, value)) {
+          playSuccessTone();
+        } else if (!hintsUsed[`${qKey}-0`]) {
+          setHintsUsed(prev => ({ ...prev, [`${qKey}-0`]: true }));
+          playSoftNope();
+        } else if (!hintsUsed[`${qKey}-1`]) {
+          setHintsUsed(prev => ({ ...prev, [`${qKey}-1`]: true }));
+          playSoftNope();
+        } else if (!hintsUsed[`${qKey}-2`]) {
+          setHintsUsed(prev => ({ ...prev, [`${qKey}-2`]: true }));
+          playBuzzer();
+        } else {
+          playSoftNope();
+        }
+      };
+
+      const toggleHint = (qKey, hintIdx) => {
+        const key = `${qKey}-${hintIdx}`;
+        const newHintsUsed = { ...hintsUsed, [key]: !hintsUsed[key] };
+        setHintsUsed(newHintsUsed);
+
+        if (newHintsUsed[key]) {
+          if (hintIdx === 2) {
+            playBuzzer();
+          } else {
+            playSoftNope();
+          }
+        } else {
+          playContinueClick();
+        }
+      };
+
+      const allAnswered = Object.keys(questions).every((qKey) => answers[qKey] !== undefined);
+      const allCorrect = Object.keys(questions).every((qKey) =>
+        checkAnswer(questions[qKey], answers[qKey])
+      );
+
+      // Handle triple-click for dev mode
+      const handleHeaderClick = () => {
+        const newCount = headerClickCount + 1;
+        setHeaderClickCount(newCount);
+
+        if (newCount === 3) {
+          setDevMode(!devMode);
+          setHeaderClickCount(0);
+        }
+
+        setTimeout(() => {
+          setHeaderClickCount(0);
+        }, 500);
+      };
+
+      // Progress bar calculation
+      const getProgressPercentage = () => {
+        const phaseOrder = ['welcome', 'phase1', 'phase2', 'phase3', 'phase4', 'phase5', 'complete'];
+        const currentIndex = phaseOrder.indexOf(phase);
+        return ((currentIndex + 1) / phaseOrder.length) * 100;
+      };
+
+      // Reset function
+      const handleRestart = () => {
+        setPhase('welcome');
+        setAnswers({});
+        setHintsUsed({});
+        setAiTransparencyOpen(true);
+        playContinueClick();
+      };
+
+      // Glossary Modal Component
+      const GlossaryModal = () => {
+        return (
+          <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+            }}
+            onClick={() => setGlossaryModalOpen(false)}
+          >
+            <div
+              style={{
+                backgroundColor: '#fff',
+                borderRadius: '8px',
+                padding: '2rem',
+                maxWidth: '600px',
+                maxHeight: '80vh',
+                overflowY: 'auto',
+                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.2)',
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h2 style={{ color: colors.primary, margin: 0 }}>Glossary</h2>
+                <button
+                  onClick={() => setGlossaryModalOpen(false)}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    color: colors.primary,
+                  }}
+                >
+                  ✕
+                </button>
+              </div>
+              <div>
+                {glossary.map((item, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      marginBottom: '1.5rem',
+                      paddingBottom: '1.5rem',
+                      borderBottom: idx < glossary.length - 1 ? `1px solid ${colors.earthLight}` : 'none',
+                    }}
+                  >
+                    <p style={{ fontWeight: '600', color: colors.primary, marginBottom: '0.5rem', margin: 0 }}>
+                      {item.term}
+                    </p>
+                    <p style={{ color: colors.earthDark, fontSize: '0.95rem', margin: 0 }}>
+                      {item.definition}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // Sound Toggle Component
+      const SoundToggle = () => (
+        <button
+            onClick={() => setSoundOn(!soundOn)}
+            style={{
+                position: 'absolute',
+                top: '16px',
+                right: '16px',
+                background: colors.sand,
+                border: 'none',
+                padding: '8px',
+                borderRadius: '50%',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '20px',
+                zIndex: 100,
+            }}
+            title={soundOn ? "Sound On" : "Sound Off"}
+        >
+            {soundOn ? '🔊' : '🔇'}
+        </button>
+      );
+
+      // Phase content
+      const renderPhase = () => {
+        switch (phase) {
+          case 'welcome':
+            return (
+              <div>
+                <h2 style={{ color: colors.primary, fontSize: '1.8rem', marginBottom: '1rem' }}>
+                  Tutorial 4: The Statement of Cash Flows
+                </h2>
+                <div style={{ backgroundColor: colors.clayLight, padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                  <p style={{ fontSize: '1.1rem', color: colors.primary, marginBottom: '1rem' }}>
+                    Welcome! Today we explore the <strong>Statement of Cash Flows</strong> — the bridge between the accrual-based
+                    Statement of Activities and the actual movement of cash.
+                  </p>
+                  <p style={{ color: colors.earthDark, marginBottom: '1rem' }}>
+                    Here's the puzzle: OHS's net assets grew by $4.0 million, but cash <em>decreased</em> by $0.5 million. Why? The Statement of
+                    Cash Flows (indirect method) will show us exactly where the cash went.
+                  </p>
+                </div>
+
+                {/* AI Transparency Note */}
+                <div style={{ backgroundColor: colors.warningBg, padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                  <button
+                    onClick={() => setAiTransparencyOpen(!aiTransparencyOpen)}
+                    style={{
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      color: colors.primary,
+                      padding: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      marginBottom: aiTransparencyOpen ? '1rem' : 0,
+                    }}
+                  >
+                    <span>{aiTransparencyOpen ? '▼' : '▶'}</span>
+                    AI Transparency Note
+                  </button>
+                  {aiTransparencyOpen && (
+                    <p style={{ color: colors.earthDark, margin: 0, fontSize: '0.95rem', lineHeight: '1.6' }}>
+                      This tutorial was developed with assistance from AI tools. All content has been carefully reviewed for accuracy. Questions are based on real financial statements (OHS — Ohio Hospital System). If you notice any errors or have questions, please reach out to the course team.
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => setPhase('phase1')}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    fontSize: '1rem',
+                    backgroundColor: colors.accent,
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  Begin →
+                </button>
+              </div>
+            );
+
+          case 'phase1':
+            return (
+              <div>
+                <h2 style={{ color: colors.primary, marginBottom: '1rem' }}>Phase 1: The Indirect Method as Reconciliation</h2>
+                <div style={{ backgroundColor: colors.clayLight, padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                  <p style={{ color: colors.primary, marginBottom: '1rem', fontWeight: '600' }}>
+                    The indirect method is NOT just another way to calculate cash from operations. It's a RECONCILIATION.
+                  </p>
+                  <p style={{ color: colors.earthDark, marginBottom: '1rem' }}>
+                    Starting point: <strong>Change in Net Assets</strong> = $4,011,032 (from the Statement of Activities)
+                  </p>
+                  <p style={{ color: colors.earthDark, marginBottom: '1rem' }}>
+                    Adjustments: We add back non-cash expenses and account for changes in working capital.
+                  </p>
+                  <p style={{ color: colors.earthDark }}>
+                    Ending point: <strong>Change in Cash</strong> = −$500,244 (the actual cash movement)
+                  </p>
+                </div>
+                {renderQuestion('q1')}
+                <button
+                  onClick={() => setPhase('phase2')}
+                  disabled={!answers.q1 || !checkAnswer(questions.q1, answers.q1)}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    fontSize: '1rem',
+                    backgroundColor: !answers.q1 || !checkAnswer(questions.q1, answers.q1) ? colors.earthLight : colors.accent,
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: !answers.q1 || !checkAnswer(questions.q1, answers.q1) ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  Continue →
+                </button>
+              </div>
+            );
+
+          case 'phase2':
+            return (
+              <div>
+                <h2 style={{ color: colors.primary, marginBottom: '1rem' }}>Phase 2: Adding Back Non-Cash Items</h2>
+                <div style={{ backgroundColor: colors.clayLight, padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                  <p style={{ color: colors.primary, marginBottom: '1rem', fontWeight: '600' }}>
+                    Depreciation is the classic example of a non-cash expense.
+                  </p>
+                  <p style={{ color: colors.earthDark, marginBottom: '1rem' }}>
+                    OHS's Statement of Activities includes a depreciation expense of $3.2 million. This reduced net assets but no cash left
+                    the organization. So we add it back.
+                  </p>
+                  <p style={{ color: colors.earthDark }}>
+                    Why? Because the cash was spent in <em>prior years</em> when the buildings and equipment were purchased. Depreciation is
+                    just the accounting allocation of that past spending across multiple years.
+                  </p>
+                </div>
+                {renderQuestion('q2')}
+                <button
+                  onClick={() => setPhase('phase3')}
+                  disabled={!answers.q2 || !checkAnswer(questions.q2, answers.q2)}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    fontSize: '1rem',
+                    backgroundColor: !answers.q2 || !checkAnswer(questions.q2, answers.q2) ? colors.earthLight : colors.accent,
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: !answers.q2 || !checkAnswer(questions.q2, answers.q2) ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  Continue →
+                </button>
+              </div>
+            );
+
+          case 'phase3':
+            return (
+              <div>
+                <h2 style={{ color: colors.primary, marginBottom: '1rem' }}>Phase 3: Cross-Statement Articulation</h2>
+                <div style={{ backgroundColor: colors.clayLight, padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                  <p style={{ color: colors.primary, marginBottom: '1rem', fontWeight: '600' }}>
+                    The cash flow statement proves the reconciliation between net assets and actual cash.
+                  </p>
+                  <p style={{ color: colors.earthDark, marginBottom: '1rem' }}>
+                    Beginning cash (from last year's Statement of Financial Position): $4,432,538
+                  </p>
+                  <p style={{ color: colors.earthDark, marginBottom: '1rem' }}>
+                    Net change in cash (from the Statement of Cash Flows): −$500,244
+                  </p>
+                  <p style={{ color: colors.earthDark }}>
+                    Ending cash (this year's Statement of Financial Position): ?
+                  </p>
+                </div>
+                {renderQuestion('q3')}
+                <button
+                  onClick={() => setPhase('phase4')}
+                  disabled={!answers.q3 || !checkAnswer(questions.q3, answers.q3)}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    fontSize: '1rem',
+                    backgroundColor: !answers.q3 || !checkAnswer(questions.q3, answers.q3) ? colors.earthLight : colors.accent,
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: !answers.q3 || !checkAnswer(questions.q3, answers.q3) ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  Continue →
+                </button>
+              </div>
+            );
+
+          case 'phase4':
+            return (
+              <div>
+                <h2 style={{ color: colors.primary, marginBottom: '1rem' }}>Phase 4: The Three Sections</h2>
+                <div style={{ backgroundColor: colors.clayLight, padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                  <p style={{ color: colors.primary, marginBottom: '1rem', fontWeight: '600' }}>
+                    The cash flow statement has three sections, each telling a part of the story:
+                  </p>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <p style={{ color: colors.earthDark, fontWeight: '600', marginBottom: '0.5rem' }}>
+                      Operating Activities: $5,511,035
+                    </p>
+                    <p style={{ color: colors.earthDark, fontSize: '0.95rem' }}>
+                      OHS's core mission activities generated $5.5M in cash.
+                    </p>
+                  </div>
+                  <div style={{ marginBottom: '1rem' }}>
+                    <p style={{ color: colors.earthDark, fontWeight: '600', marginBottom: '0.5rem' }}>
+                      Investing Activities: −$7,763,636
+                    </p>
+                    <p style={{ color: colors.earthDark, fontSize: '0.95rem' }}>
+                      But the organization spent $7.8M on property, equipment, and long-term investments.
+                    </p>
+                  </div>
+                  <div>
+                    <p style={{ color: colors.earthDark, fontWeight: '600', marginBottom: '0.5rem' }}>
+                      Financing Activities: $1,752,357
+                    </p>
+                    <p style={{ color: colors.earthDark, fontSize: '0.95rem' }}>
+                      Restricted contributions and debt financing brought in $1.8M.
+                    </p>
+                  </div>
+                </div>
+                {renderQuestion('q4')}
+                <button
+                  onClick={() => setPhase('phase5')}
+                  disabled={!answers.q4 || !checkAnswer(questions.q4, answers.q4)}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    fontSize: '1rem',
+                    backgroundColor: !answers.q4 || !checkAnswer(questions.q4, answers.q4) ? colors.earthLight : colors.accent,
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: !answers.q4 || !checkAnswer(questions.q4, answers.q4) ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  Continue →
+                </button>
+              </div>
+            );
+
+          case 'phase5':
+            return (
+              <div>
+                <h2 style={{ color: colors.primary, marginBottom: '1rem' }}>Phase 5: The Total-Level Perspective</h2>
+                <div style={{ backgroundColor: colors.clayLight, padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                  <p style={{ color: colors.primary, marginBottom: '1rem', fontWeight: '600' }}>
+                    The cash flow statement operates at the <em>total net assets</em> level.
+                  </p>
+                  <p style={{ color: colors.earthDark, marginBottom: '1rem' }}>
+                    It doesn't distinguish between restricted and unrestricted contributions, or between categories of net assets. Why?
+                    Because cash is cash — a dollar of restricted cash behaves identically to an unrestricted dollar in the organization's
+                    bank account.
+                  </p>
+                  <p style={{ color: colors.earthDark }}>
+                    The cash flow statement shows <strong>total change in net assets</strong> as its starting point and reconciles to the
+                    actual change in the organization's bank balance.
+                  </p>
+                </div>
+                {renderQuestion('q5')}
+                <button
+                  onClick={() => setPhase('complete')}
+                  disabled={!answers.q5 || !checkAnswer(questions.q5, answers.q5)}
+                  style={{
+                    padding: '0.75rem 1.5rem',
+                    fontSize: '1rem',
+                    backgroundColor: !answers.q5 || !checkAnswer(questions.q5, answers.q5) ? colors.earthLight : colors.accent,
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: !answers.q5 || !checkAnswer(questions.q5, answers.q5) ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                  }}
+                >
+                  Finish →
+                </button>
+              </div>
+            );
+
+          case 'complete':
+            return (
+              <div>
+                {/* Trophy */}
+                <div style={{ textAlign: 'center', fontSize: '4rem', marginBottom: '1.5rem' }}>
+                  🏆
+                </div>
+
+                {/* What You Discovered */}
+                <div style={{ backgroundColor: colors.clayLight, padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                  <h3 style={{ color: colors.primary, marginBottom: '1rem' }}>What You Discovered</h3>
+                  <ol style={{ color: colors.earthDark, lineHeight: '1.8' }}>
+                    <li style={{ marginBottom: '0.75rem' }}>
+                      The cash flow statement (indirect method) is a <strong>RECONCILIATION</strong>, not a standalone report
+                    </li>
+                    <li style={{ marginBottom: '0.75rem' }}>
+                      It starts with the change in net assets and adjusts to arrive at the change in cash
+                    </li>
+                    <li style={{ marginBottom: '0.75rem' }}>
+                      Non-cash items like depreciation are added back because they reduced net assets without using cash
+                    </li>
+                    <li style={{ marginBottom: '0.75rem' }}>
+                      Three sections—Operating, Investing, and Financing activities—show where cash was generated and spent
+                    </li>
+                    <li>
+                      The statement is indifferent to donor restriction categories — it operates at the total level
+                    </li>
+                  </ol>
+                </div>
+
+                {/* The Deeper Point */}
+                <div style={{ backgroundColor: colors.successBg, padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', borderLeft: `6px solid ${colors.success}` }}>
+                  <h3 style={{ color: colors.primary, marginBottom: '1rem' }}>The Deeper Point</h3>
+                  <p style={{ color: colors.earthDark, lineHeight: '1.6', margin: 0 }}>
+                    This tutorial showed you the bridge between the accrual-based financial world (Statement of Activities) and the cash-based reality (bank account). Understanding cash flows is essential for assessing organizational health. An organization can be profitable on paper but cash-strapped in reality. The Statement of Cash Flows reveals the true story.
+                  </p>
+                </div>
+
+                {/* Coming Next */}
+                <div style={{ backgroundColor: colors.warningBg, padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                  <h3 style={{ color: colors.primary, marginBottom: '1rem' }}>Coming Next</h3>
+                  <p style={{ color: colors.earthDark, marginBottom: '0.5rem' }}>
+                    <strong>Tutorial 5 — Liquidity & Functional Expenses</strong>
+                  </p>
+                  <p style={{ color: colors.earthDark }}>
+                    How do you know if an organization can pay its bills? We'll explore liquidity ratios and how to read the Statement of Functional Expenses.
+                  </p>
+                </div>
+
+                {/* Next Tutorial Button */}
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+                  <button
+                    onClick={handleRestart}
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      fontSize: '1rem',
+                      backgroundColor: colors.sand,
+                      color: colors.primary,
+                      border: `2px solid ${colors.earth}`,
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                    }}
+                  >
+                    Restart Tutorial
+                  </button>
+                  <a
+                    href="NFP-Tutorial-5-Liquidity-and-Expenses.html"
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      fontSize: '1rem',
+                      backgroundColor: colors.accent,
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                    }}
+                  >
+                    Next Tutorial →
+                  </a>
+                </div>
+              </div>
+            );
+
+          default:
+            return null;
+        }
+      };
+
+      return (
+        <div
+          style={{
+            minHeight: '100vh',
+            backgroundColor: colors.sand,
+            padding: '2rem 1rem',
+            fontFamily:
+              '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            color: colors.primary,
+            position: 'relative',
+          }}
+        >
+          <SoundToggle />
+          {/* Header */}
+          <div
+            style={{
+              maxWidth: '900px',
+              margin: '0 auto 2rem',
+              borderBottom: `2px solid ${colors.earth}`,
+              paddingBottom: '1rem',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+              <h1
+                style={{ margin: 0, color: colors.primary, fontSize: '1.5rem', cursor: 'pointer', userSelect: 'none' }}
+                onClick={handleHeaderClick}
+                title="Triple-click for dev mode"
+              >
+                Rick2.0
+              </h1>
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <button
+                  onClick={() => setGlossaryModalOpen(true)}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                  title="Open Glossary"
+                >
+                  📖
+                </button>
+                <button
+                  onClick={handleRestart}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    fontSize: '1.5rem',
+                    cursor: 'pointer',
+                    padding: 0,
+                  }}
+                  title="Restart Tutorial"
+                >
+                  ↺
+                </button>
+              </div>
+            </div>
+            <p style={{ margin: '0 0 1rem 0', fontSize: '0.95rem', color: colors.earthDark }}>
+              Yale School of Management • NFP Financial Literacy
+            </p>
+
+            {/* Progress Bar */}
+            <div style={{ backgroundColor: colors.earthLight, borderRadius: '4px', height: '6px', overflow: 'hidden', marginBottom: devMode ? '1rem' : '0' }}>
+              <div
+                style={{
+                  backgroundColor: colors.accent,
+                  height: '100%',
+                  width: `${getProgressPercentage()}%`,
+                  transition: 'width 0.3s ease',
+                }}
+              />
+            </div>
+
+            {/* Dev Mode Phase Skip Buttons */}
+            {devMode && (
+              <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(220,38,38,0.1)', borderRadius: '6px' }}>
+                <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', fontWeight: 'bold', color: colors.error }}>Dev Mode: Skip to phase</p>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {['welcome', 'phase1', 'phase2', 'phase3', 'phase4', 'phase5', 'complete'].map(p => (
+                    <button
+                      key={p}
+                      onClick={() => { setPhase(p); setAnswers({}); setHintsUsed({}); }}
+                      style={{
+                        padding: '0.4rem 0.8rem',
+                        fontSize: '0.8rem',
+                        fontWeight: 'bold',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        backgroundColor: p === phase ? colors.accent : 'rgba(0,0,0,0.1)',
+                        color: p === phase ? '#fff' : colors.error,
+                      }}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Main Content */}
+          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            {renderPhase()}
+          </div>
+
+          {/* Footer */}
+          <div
+            style={{
+              maxWidth: '900px',
+              margin: '2rem auto 0',
+              paddingTop: '1.5rem',
+              borderTop: `1px solid ${colors.earthLight}`,
+              textAlign: 'center',
+              fontSize: '0.85rem',
+              color: colors.earthDark,
+            }}
+          >
+            <p>Tutorial 4 of 6 • Statement of Cash Flows (Indirect Method)</p>
+          </div>
+
+          {/* Glossary Modal */}
+          {glossaryModalOpen && <GlossaryModal />}
+        </div>
+      );
+    };
+
+    // Render the app
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<NFPTutorial4 />);
+  </script>
+</body>
+</html>

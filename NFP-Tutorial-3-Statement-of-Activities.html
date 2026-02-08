@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rick2.0 - Tutorial 3: Statement of Activities</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f5f1e8;
+    }
+
+    html, body, #root {
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: #00356b;
+      color: white;
+      padding: 20px 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    header > div {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title {
+      cursor: pointer;
+    }
+
+    .header-title h1 {
+      margin: 0 0 4px 0;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .header-title p {
+      margin: 0;
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn-accent {
+      background: #c9a227;
+      color: #00356b;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .progress-container {
+      margin-top: 16px;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background-color: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: #c9a227;
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      margin: 8px 0 0 0;
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .glossary-panel {
+      background-color: #e8dcc8;
+      padding: 20px 30px;
+    }
+
+    .glossary-content {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .glossary-content h3 {
+      margin-top: 0;
+      color: #5c4d3d;
+    }
+
+    .glossary-item {
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #c4a574;
+    }
+
+    .glossary-item:last-child {
+      border-bottom: none;
+    }
+
+    .glossary-term {
+      margin: 0 0 6px 0;
+      font-weight: 600;
+      color: #5c4d3d;
+    }
+
+    .glossary-def {
+      margin: 0;
+      font-size: 14px;
+      color: #8b7355;
+    }
+
+    main {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+    }
+
+    .phase-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    h2 {
+      color: #00356b;
+      margin-top: 0;
+    }
+
+    h3 {
+      color: #00356b;
+      margin-top: 0;
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.7;
+      color: #8b7355;
+    }
+
+    ul {
+      color: #8b7355;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .formula-box {
+      background-color: #f5f1e8;
+      padding: 16px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 14px;
+      color: #5c4d3d;
+      margin-bottom: 20px;
+    }
+
+    .formula-box-success {
+      background-color: #f0fdf4;
+      border: 2px solid #22c55e;
+      padding: 16px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 14px;
+      color: #5c4d3d;
+      margin-bottom: 20px;
+    }
+
+    .info-box {
+      background-color: #fffbeb;
+      border: 1px solid #f59e0b;
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-top: 20px;
+    }
+
+    .info-box-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0;
+      margin-bottom: 8px;
+    }
+
+    .info-box-title {
+      margin: 0;
+      font-weight: 600;
+      color: #f59e0b;
+      text-align: left;
+    }
+
+    .info-box-content {
+      margin: 8px 0 0 0;
+      font-size: 14px;
+      color: #8b7355;
+    }
+
+    .question-section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 24px;
+    }
+
+    .answer-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .answer-btn {
+      padding: 12px;
+      border: 2px solid #d4c4a8;
+      background-color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .answer-btn:disabled {
+      cursor: default;
+    }
+
+    .answer-btn.selected-error {
+      border-color: #dc2626;
+      background-color: #fef2f2;
+    }
+
+    .answer-btn.selected-success {
+      border-color: #22c55e;
+      background-color: #f0fdf4;
+    }
+
+    .answer-btn.faded {
+      opacity: 0.5;
+    }
+
+    .success-feedback {
+      margin-top: 16px;
+      background-color: #f0fdf4;
+      border: 1px solid #22c55e;
+      border-radius: 6px;
+      padding: 12px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .success-icon {
+      flex-shrink: 0;
+      font-size: 20px;
+    }
+
+    .success-text-title {
+      margin: 0 0 6px 0;
+      font-weight: 600;
+      color: #22c55e;
+    }
+
+    .success-text-body {
+      margin: 0;
+      font-size: 14px;
+      color: #8b7355;
+    }
+
+    .hint-btn {
+      margin-top: 12px;
+      background: #c9a227;
+      color: #00356b;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .hint-box {
+      margin-top: 12px;
+      background-color: #fffbeb;
+      border: 1px solid #f59e0b;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: #8b7355;
+    }
+
+    .input-group {
+      margin-top: 16px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 10px;
+      border: 2px solid #d4c4a8;
+      border-radius: 6px;
+      font-size: 15px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .input-group button {
+      background: #00356b;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .feedback-error {
+      margin-top: 10px;
+      color: #dc2626;
+      font-size: 14px;
+    }
+
+    .continue-btn {
+      align-self: center;
+      background: #00356b;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      margin-bottom: 24px;
+    }
+
+    .continue-btn:disabled {
+      background: #ccc;
+      cursor: default;
+    }
+
+    .three-col-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .col-header {
+      background-color: #e8dcc8;
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+      font-weight: 600;
+      color: #5c4d3d;
+    }
+
+    .code-box {
+      background-color: #f5f1e8;
+      padding: 20px;
+      border-radius: 6px;
+      margin-top: 16px;
+      margin-bottom: 20px;
+      font-family: monospace;
+      font-size: 15px;
+      color: #5c4d3d;
+      line-height: 1.8;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #f5f1e8;
+      padding: 20px;
+      border-radius: 6px;
+    }
+
+    .data-table td {
+      padding: 8px 0;
+      color: #5c4d3d;
+    }
+
+    .data-table td:first-child {
+      font-weight: 600;
+    }
+
+    .data-table td:last-child {
+      text-align: right;
+    }
+
+    .data-table tr.total {
+      border-top: 2px solid #8b7355;
+      background-color: #f0fdf4;
+    }
+
+    .data-table tr.total td {
+      color: #22c55e;
+      font-weight: 600;
+    }
+
+    .italic-note {
+      font-size: 14px;
+      color: #8b7355;
+      font-style: italic;
+    }
+
+    .warning-box {
+      background-color: #fffbeb;
+      border: 1px solid #f59e0b;
+      border-radius: 6px;
+      padding: 16px;
+      margin-top: 16px;
+      margin-bottom: 20px;
+    }
+
+    .warning-box-title {
+      margin: 0 0 8px 0;
+      font-weight: 600;
+      color: #5c4d3d;
+    }
+
+    .warning-box p {
+      margin: 8px 0 0 0;
+      font-size: 14px;
+      color: #8b7355;
+    }
+
+    .warning-box p:first-of-type {
+      margin: 0;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px;
+      border: 2px solid #d4c4a8;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      resize: vertical;
+      margin-top: 16px;
+    }
+
+    .complete-section {
+      background-color: white;
+      border-radius: 8px;
+      padding: 40px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    .complete-icon {
+      font-size: 64px;
+      margin: 0 auto 16px;
+      display: block;
+    }
+
+    .complete-success-box {
+      background-color: #f0fdf4;
+      border: 2px solid #22c55e;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .complete-success-box h3 {
+      color: #22c55e;
+      margin-top: 0;
+    }
+
+    .complete-success-box ol {
+      color: #8b7355;
+      font-size: 15px;
+      line-height: 1.8;
+      padding-left: 20px;
+    }
+
+    .complete-next-box {
+      background-color: #e8dcc8;
+      border: 1px solid #c4a574;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 30px;
+      text-align: left;
+    }
+
+    .complete-next-box h3 {
+      color: #5c4d3d;
+      margin-top: 0;
+    }
+
+    .complete-next-box p {
+      color: #8b7355;
+      font-size: 15px;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .complete-next-box p:last-child {
+      font-size: 14px;
+      margin: 8px 0 0 0;
+    }
+
+    .complete-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .complete-btn {
+      background: #00356b;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .complete-btn.accent {
+      background: #c9a227;
+      color: #00356b;
+    }
+
+    .dev-mode {
+      margin-top: 30px;
+      background-color: #f5f1e8;
+      border: 2px solid #c9a227;
+      border-radius: 6px;
+      padding: 16px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #5c4d3d;
+    }
+
+    .dev-mode p {
+      margin: 0;
+      font-size: 12px;
+      color: #5c4d3d;
+    }
+
+    .dev-mode p:first-child {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .dev-mode p:not(:first-child) {
+      margin: 4px 0;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const colors = {
+      primary: '#00356b',
+      sand: '#f5f1e8',
+      earth: '#8b7355',
+      earthLight: '#d4c4a8',
+      earthDark: '#5c4d3d',
+      accent: '#c9a227',
+      clay: '#c4a574',
+      clayLight: '#e8dcc8',
+      clayDark: '#a08050',
+      success: '#22c55e',
+      successBg: '#f0fdf4',
+      warning: '#f59e0b',
+      warningBg: '#fffbeb',
+      error: '#dc2626',
+      errorBg: '#fef2f2',
+    };
+
+    // Audio context API - created lazily on first use
+    let audioContext = null;
+
+    const getAudioContext = () => {
+      if (!audioContext) {
+        try {
+          audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (e) {
+          console.warn('AudioContext not available');
+          return null;
+        }
+      }
+      return audioContext;
+    };
+
+    const playSuccessTone = () => {
+      if (!soundOn) return;
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(523.25, now);
+      osc.frequency.setValueAtTime(659.25, now + 0.1);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+      osc.start(now);
+      osc.stop(now + 0.2);
+    };
+
+    const playSoftNope = () => {
+      if (!soundOn) return;
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(300, now);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+      osc.start(now);
+      osc.stop(now + 0.15);
+    };
+
+    const playBuzzer = () => {
+      if (!soundOn) return;
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(200, now);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+      osc.start(now);
+      osc.stop(now + 0.3);
+    };
+
+    const playContinueClick = () => {
+      if (!soundOn) return;
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.frequency.setValueAtTime(440, now);
+      gain.gain.setValueAtTime(0.1, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+      osc.start(now);
+      osc.stop(now + 0.1);
+    };
+
+    const NFPTutorial3 = () => {
+      const [phase, setPhase] = useState('welcome');
+      const [devMode, setDevMode] = useState(false);
+      const [glossaryOpen, setGlossaryOpen] = useState(false);
+      const [showAINote, setShowAINote] = useState(true);
+      const [tripleTaps, setTripleTaps] = useState(0);
+      const [soundOn, setSoundOn] = useState(true);
+
+      // Q1 State
+      const [q1Answer, setQ1Answer] = useState(null);
+      const [q1Hints, setQ1Hints] = useState(0);
+      const [q1Complete, setQ1Complete] = useState(false);
+
+      // Q2 State
+      const [q2Input, setQ2Input] = useState('');
+      const [q2Hints, setQ2Hints] = useState(0);
+      const [q2Complete, setQ2Complete] = useState(false);
+      const [q2Feedback, setQ2Feedback] = useState('');
+
+      // Q3 State
+      const [q3Answer, setQ3Answer] = useState(null);
+      const [q3Hints, setQ3Hints] = useState(0);
+      const [q3Complete, setQ3Complete] = useState(false);
+
+      // Q4 State
+      const [q4Answer, setQ4Answer] = useState(null);
+      const [q4Hints, setQ4Hints] = useState(0);
+      const [q4Complete, setQ4Complete] = useState(false);
+
+      // Q5 State
+      const [q5Input, setQ5Input] = useState('');
+      const [q5Complete, setQ5Complete] = useState(false);
+      const [q5Feedback, setQ5Feedback] = useState('');
+
+      const SoundToggle = () => (
+        <button
+          onClick={() => setSoundOn(!soundOn)}
+          style={{
+            position: 'absolute',
+            top: '16px',
+            right: '16px',
+            background: colors.sand,
+            border: 'none',
+            padding: '8px',
+            borderRadius: '50%',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '20px',
+            zIndex: 100,
+          }}
+          title={soundOn ? "Sound On" : "Sound Off"}
+        >
+          {soundOn ? '🔊' : '🔇'}
+        </button>
+      );
+
+      const handleTripleClick = () => {
+        setTripleTaps(t => {
+          if (t === 2) {
+            setDevMode(!devMode);
+            return 0;
+          }
+          return t + 1;
+        });
+        setTimeout(() => setTripleTaps(0), 500);
+      };
+
+      const handleQ1Answer = (option) => {
+        if (q1Complete) return;
+        setQ1Answer(option);
+        if (option === 'B') {
+          playSuccessTone();
+          setQ1Complete(true);
+        } else if (q1Hints < 3) {
+          if (q1Hints === 2) {
+            playBuzzer();
+          } else {
+            playSoftNope();
+          }
+          setQ1Hints(q1Hints + 1);
+        } else {
+          playSoftNope();
+        }
+      };
+
+      const handleQ1Hint = () => {
+        if (q1Hints < 3 && !q1Complete) {
+          if (q1Hints === 2) {
+            playBuzzer();
+          } else {
+            playSoftNope();
+          }
+          setQ1Hints(q1Hints + 1);
+        }
+      };
+
+      const handleQ2Answer = (value) => {
+        setQ2Input(value);
+      };
+
+      const handleQ2Submit = () => {
+        if (q2Complete) return;
+        const numValue = parseInt(q2Input.replace(/,/g, '').replace(/\$/g, '')) || 0;
+        const isCorrect = numValue === 41000000 || parseInt(q2Input) === 41;
+
+        if (isCorrect) {
+          playSuccessTone();
+          setQ2Complete(true);
+          setQ2Feedback('');
+        } else if (q2Hints < 3) {
+          if (q2Hints === 2) {
+            playBuzzer();
+          } else {
+            playSoftNope();
+          }
+          setQ2Hints(q2Hints + 1);
+          setQ2Feedback('Not quite. Check the hints below.');
+        } else {
+          playSoftNope();
+          setQ2Feedback('Not quite. The answer is shown below.');
+        }
+      };
+
+      const handleQ2Hint = () => {
+        if (q2Hints < 3 && !q2Complete) {
+          if (q2Hints === 2) {
+            playBuzzer();
+          } else {
+            playSoftNope();
+          }
+          setQ2Hints(q2Hints + 1);
+        }
+      };
+
+      const handleQ3Answer = (option) => {
+        if (q3Complete) return;
+        setQ3Answer(option);
+        if (option === 'B') {
+          playSuccessTone();
+          setQ3Complete(true);
+        } else if (q3Hints < 3) {
+          if (q3Hints === 2) {
+            playBuzzer();
+          } else {
+            playSoftNope();
+          }
+          setQ3Hints(q3Hints + 1);
+        } else {
+          playSoftNope();
+        }
+      };
+
+      const handleQ3Hint = () => {
+        if (q3Hints < 3 && !q3Complete) {
+          if (q3Hints === 2) {
+            playBuzzer();
+          } else {
+            playSoftNope();
+          }
+          setQ3Hints(q3Hints + 1);
+        }
+      };
+
+      const handleQ4Answer = (option) => {
+        if (q4Complete) return;
+        setQ4Answer(option);
+        if (option === 'B') {
+          playSuccessTone();
+          setQ4Complete(true);
+        } else if (q4Hints < 3) {
+          if (q4Hints === 2) {
+            playBuzzer();
+          } else {
+            playSoftNope();
+          }
+          setQ4Hints(q4Hints + 1);
+        } else {
+          playSoftNope();
+        }
+      };
+
+      const handleQ4Hint = () => {
+        if (q4Hints < 3 && !q4Complete) {
+          if (q4Hints === 2) {
+            playBuzzer();
+          } else {
+            playSoftNope();
+          }
+          setQ4Hints(q4Hints + 1);
+        }
+      };
+
+      const handleQ5Submit = () => {
+        if (q5Complete) return;
+        if (q5Input.trim().length > 20) {
+          playSuccessTone();
+          setQ5Complete(true);
+        } else {
+          playSoftNope();
+          setQ5Feedback('Please provide a more complete reflection.');
+        }
+      };
+
+      const allQuestionsComplete =
+        q1Complete && q2Complete && q3Complete && q4Complete && q5Complete;
+
+      const progressPhases = [
+        'welcome',
+        'phase1',
+        'phase2',
+        'phase3',
+        'phase4',
+        'phase5',
+        'complete',
+      ];
+      const progressPercent =
+        ((progressPhases.indexOf(phase) + 1) / progressPhases.length) * 100;
+
+      const restart = () => {
+        setPhase('welcome');
+        setQ1Answer(null);
+        setQ1Hints(0);
+        setQ1Complete(false);
+        setQ2Input('');
+        setQ2Hints(0);
+        setQ2Complete(false);
+        setQ2Feedback('');
+        setQ3Answer(null);
+        setQ3Hints(0);
+        setQ3Complete(false);
+        setQ4Answer(null);
+        setQ4Hints(0);
+        setQ4Complete(false);
+        setQ5Input('');
+        setQ5Complete(false);
+        setQ5Feedback('');
+        playContinueClick();
+      };
+
+      const glossaryTerms = [
+        {
+          term: 'Statement of Activities',
+          def: 'Shows how net assets changed during a period — revenues/support minus expenses. The nonprofit equivalent of an income statement.',
+        },
+        {
+          term: 'Change in Net Assets',
+          def: 'The bottom line — total revenues and support minus total expenses. Tells you whether net assets grew or shrank.',
+        },
+        {
+          term: 'Released from Restrictions',
+          def: 'A reclassification from With Donor Restrictions to Without Donor Restrictions when donor conditions are met. Not new money — total doesn\'t change.',
+        },
+        {
+          term: 'Revenue/Support',
+          def: 'Inflows of resources — contributions, grants, program fees, investment returns. Called "support" because some inflows (like grants) aren\'t commercial revenue.',
+        },
+        {
+          term: 'Cross-Statement Articulation',
+          def: 'How financial statements connect — ending net assets on the Statement of Activities should match net assets on the Statement of Financial Position.',
+        },
+      ];
+
+      return (
+        <div style={{ minHeight: '100vh', backgroundColor: colors.sand, position: 'relative' }}>
+          <SoundToggle />
+          {/* Header */}
+          <header>
+            <div>
+              <div className="header-top">
+                <div className="header-title" onClick={handleTripleClick}>
+                  <h1>Rick2.0</h1>
+                  <p>Yale School of Management • NFP Financial Literacy</p>
+                </div>
+                <div className="header-buttons">
+                  <button
+                    className="btn-accent"
+                    onClick={() => setGlossaryOpen(!glossaryOpen)}
+                  >
+                    📖 Glossary
+                  </button>
+                  <button
+                    className="btn-accent"
+                    onClick={restart}
+                  >
+                    ↺ Restart
+                  </button>
+                  {devMode && (
+                    <>
+                      <button
+                        className="btn-accent"
+                        onClick={() => setPhase('phase1')}
+                        style={{ fontSize: '12px' }}
+                      >
+                        ⊳ Phase 1
+                      </button>
+                      <button
+                        className="btn-accent"
+                        onClick={() => setPhase('phase2')}
+                        style={{ fontSize: '12px' }}
+                      >
+                        ⊳ Phase 2
+                      </button>
+                      <button
+                        className="btn-accent"
+                        onClick={() => setPhase('phase3')}
+                        style={{ fontSize: '12px' }}
+                      >
+                        ⊳ Phase 3
+                      </button>
+                      <button
+                        className="btn-accent"
+                        onClick={() => setPhase('phase4')}
+                        style={{ fontSize: '12px' }}
+                      >
+                        ⊳ Phase 4
+                      </button>
+                      <button
+                        className="btn-accent"
+                        onClick={() => setPhase('phase5')}
+                        style={{ fontSize: '12px' }}
+                      >
+                        ⊳ Phase 5
+                      </button>
+                      <button
+                        className="btn-accent"
+                        onClick={() => setPhase('complete')}
+                        style={{ fontSize: '12px' }}
+                      >
+                        ⊳ Complete
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Progress Bar */}
+              <div className="progress-container">
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{ width: `${progressPercent}%` }} />
+                </div>
+                <p className="progress-text">
+                  Tutorial 3 of 6: Statement of Activities
+                </p>
+              </div>
+            </div>
+          </header>
+
+          {/* Glossary Panel */}
+          {glossaryOpen && (
+            <div className="glossary-panel">
+              <div className="glossary-content">
+                <h3>Glossary</h3>
+                {glossaryTerms.map((item, idx) => (
+                  <div key={idx} className="glossary-item">
+                    <p className="glossary-term">{item.term}</p>
+                    <p className="glossary-def">{item.def}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Main Content */}
+          <main>
+            {/* Welcome Phase */}
+            {phase === 'welcome' && (
+              <div className="card">
+                <h2>Tutorial 3: The Statement of Activities</h2>
+                <p>
+                  Welcome! In this tutorial, you'll learn the nonprofit "income statement" — the
+                  Statement of Activities. This statement shows how an organization's net assets changed
+                  during a period.
+                </p>
+                <p>We'll explore:</p>
+                <ul>
+                  <li>How the Statement of Activities bridges for-profit and nonprofit accounting</li>
+                  <li>The revenue/support and expense categories that drive change</li>
+                  <li>The crucial role of "released from restrictions" as a reclassification</li>
+                  <li>How this statement connects to others in the financial report</li>
+                  <li>Why a positive change doesn't automatically mean financial health</li>
+                </ul>
+
+                {/* AI Transparency Note */}
+                <div className="info-box">
+                  <button
+                    className="info-box-toggle"
+                    onClick={() => setShowAINote(!showAINote)}
+                  >
+                    <p className="info-box-title">AI Transparency Note</p>
+                    <span>{showAINote ? '▲' : '▼'}</span>
+                  </button>
+                  {showAINote && (
+                    <p className="info-box-content">
+                      This tutorial was created by Claude AI at Anthropic. The content reflects
+                      nonprofit accounting standards and pedagogy from Yale School of Management. All
+                      data and explanations are accurate and educationally sound.
+                    </p>
+                  )}
+                </div>
+
+                <button
+                  className="continue-btn"
+                  onClick={() => {
+                    setPhase('phase1');
+                    playContinueClick();
+                  }}
+                >
+                  Start Learning
+                </button>
+              </div>
+            )}
+
+            {/* Phase 1: Intro to Statement of Activities */}
+            {phase === 'phase1' && (
+              <div className="phase-container">
+                <div className="card">
+                  <h2>From Income Statement to Statement of Activities</h2>
+                  <p>In a for-profit company, the income statement shows:</p>
+                  <div className="formula-box">
+                    Revenue − Expenses = <strong>Net Income</strong>
+                  </div>
+                  <p>
+                    In a nonprofit, we replace "Net Income" with "Change in Net Assets" — because
+                    there are no owners earning a profit. Instead, the statement tracks whether the
+                    organization's net assets grew or shrank:
+                  </p>
+                  <div className="formula-box-success">
+                    Revenue/Support − Expenses = <strong>Change in Net Assets</strong>
+                  </div>
+                  <p>
+                    The Statement of Activities is the nonprofit equivalent of an income statement.
+                  </p>
+                </div>
+
+                {/* Question 1 */}
+                <div className="question-section">
+                  <h3>Question 1</h3>
+                  <p>
+                    A for-profit income statement shows Revenue minus Expenses equals Net Income. What's
+                    the nonprofit equivalent on the Statement of Activities?
+                  </p>
+
+                  <div className="answer-options">
+                    <button
+                      className={`answer-btn ${q1Answer === 'A' ? 'selected-error' : ''} ${q1Complete && q1Answer !== 'A' ? 'faded' : ''}`}
+                      onClick={() => handleQ1Answer('A')}
+                      disabled={q1Complete}
+                    >
+                      A) Revenue minus Expenses equals Net Income
+                    </button>
+                    <button
+                      className={`answer-btn ${q1Answer === 'B' ? 'selected-success' : ''} ${q1Complete && q1Answer !== 'B' ? 'faded' : ''}`}
+                      onClick={() => handleQ1Answer('B')}
+                      disabled={q1Complete}
+                    >
+                      B) Revenue/Support minus Expenses equals Change in Net Assets
+                    </button>
+                  </div>
+
+                  {q1Complete && (
+                    <div className="success-feedback">
+                      <span className="success-icon">✓</span>
+                      <div>
+                        <p className="success-text-title">Correct!</p>
+                        <p className="success-text-body">
+                          Nonprofits don't have "net income" because they don't have owners earning a
+                          profit. Instead, the statement tracks whether total net assets grew or shrank
+                          during the period, and what caused the change.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {!q1Complete && (
+                    <button className="hint-btn" onClick={handleQ1Hint}>
+                      💡 Hint {q1Hints + 1}/3
+                    </button>
+                  )}
+
+                  {q1Hints > 0 && !q1Complete && (
+                    <div className="hint-box">
+                      {q1Hints === 1 &&
+                        "Nonprofits don't have 'net income' because they don't have owners earning a profit."}
+                      {q1Hints === 2 &&
+                        'The bottom line on the Statement of Activities is the change in net assets during the period.'}
+                      {q1Hints === 3 &&
+                        'Think about what changed: "Net Income" vs. "Change in Net Assets" — which one fits a nonprofit?'}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  className="continue-btn"
+                  onClick={() => {
+                    setPhase('phase2');
+                    playContinueClick();
+                  }}
+                  disabled={!q1Complete}
+                  style={{ background: q1Complete ? colors.primary : '#ccc' }}
+                >
+                  Continue
+                </button>
+              </div>
+            )}
+
+            {/* Phase 2: OHS Data & Basic Math */}
+            {phase === 'phase2' && (
+              <div className="phase-container">
+                <div className="card">
+                  <h2>Real Data: Oregon Humane Society Financial Summary (FY2024)</h2>
+                  <table className="data-table">
+                    <tbody>
+                      <tr>
+                        <td>Total Revenue/Support:</td>
+                        <td>~$41,027,439</td>
+                      </tr>
+                      <tr>
+                        <td>Total Expenses:</td>
+                        <td>$37,016,407</td>
+                      </tr>
+                      <tr className="total">
+                        <td>Change in Net Assets:</td>
+                        <td>$4,011,032</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p className="italic-note">
+                    Oregon Humane Society (OHS) is a real nonprofit we're using for examples.
+                    The numbers show their actual FY2024 activity.
+                  </p>
+                </div>
+
+                {/* Question 2 */}
+                <div className="question-section">
+                  <h3>Question 2</h3>
+                  <p>
+                    OHS's total expenses were $37,016,407 and the change in net assets was $4,011,032.
+                    Approximately how much was total revenue and support? <strong>(Round to the nearest million)</strong>
+                  </p>
+
+                  <div className="input-group">
+                    <input
+                      type="text"
+                      value={q2Input}
+                      onChange={(e) => handleQ2Answer(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' && !q2Complete) handleQ2Submit(); }}
+                      disabled={q2Complete}
+                      placeholder="Enter amount (e.g., 41 or 41,000,000)"
+                    />
+                    <button
+                      onClick={handleQ2Submit}
+                      disabled={q2Complete || q2Input.trim() === ''}
+                    >
+                      Check
+                    </button>
+                  </div>
+
+                  {q2Feedback && (
+                    <p className="feedback-error">{q2Feedback}</p>
+                  )}
+
+                  {q2Complete && (
+                    <div className="success-feedback">
+                      <span className="success-icon">✓</span>
+                      <div>
+                        <p className="success-text-title">Correct!</p>
+                        <p className="success-text-body">
+                          Total revenue and support was approximately $41 million. The change in net
+                          assets ($4.0M) is like a "surplus" — revenues exceeded expenses. This doesn't
+                          mean the organization made a profit in the for-profit sense; it means net
+                          assets grew during the period.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {!q2Complete && (
+                    <button className="hint-btn" onClick={handleQ2Hint}>
+                      💡 Hint {q2Hints + 1}/3
+                    </button>
+                  )}
+
+                  {q2Hints > 0 && !q2Complete && (
+                    <div className="hint-box">
+                      {q2Hints === 1 &&
+                        'If Change in Net Assets = Revenue − Expenses, then Revenue = Change + Expenses.'}
+                      {q2Hints === 2 &&
+                        '$4,011,032 + $37,016,407 = approximately $41 million'}
+                      {q2Hints === 3 &&
+                        'Try entering just "41" or "41000000" or "$41,000,000" — any format works!'}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  className="continue-btn"
+                  onClick={() => {
+                    setPhase('phase3');
+                    playContinueClick();
+                  }}
+                  disabled={!q2Complete}
+                  style={{ background: q2Complete ? colors.primary : '#ccc' }}
+                >
+                  Continue
+                </button>
+              </div>
+            )}
+
+            {/* Phase 3: Released from Restrictions */}
+            {phase === 'phase3' && (
+              <div className="phase-container">
+                <div className="card">
+                  <h2>The Crucial Reclassification: Released from Restrictions</h2>
+                  <p>The Statement of Activities has three columns:</p>
+                  <div className="three-col-grid">
+                    <div className="col-header">Without Donor Restrictions</div>
+                    <div className="col-header">With Donor Restrictions</div>
+                    <div className="col-header">Total</div>
+                  </div>
+                  <p>
+                    "Released from restrictions" appears on the Statement of Activities when donor
+                    conditions are met (e.g., the donor funded a building, and it was built). The amount
+                    moves from the "With Donor Restrictions" column to the "Without Donor Restrictions"
+                    column. <strong>This is a reclassification, not new revenue.</strong>
+                  </p>
+                  <p>
+                    Key insight: The positive amount in one column cancels the negative amount in the
+                    other. The total doesn't change.
+                  </p>
+                </div>
+
+                {/* Question 3 */}
+                <div className="question-section">
+                  <h3>Question 3</h3>
+                  <p>
+                    The Statement of Activities shows "Net assets released from restrictions:
+                    $3,200,000" as a POSITIVE number in the Without Donor Restrictions column and a
+                    NEGATIVE number in the With Donor Restrictions column. What does this represent?
+                  </p>
+
+                  <div className="answer-options">
+                    <button
+                      className={`answer-btn ${q3Answer === 'A' ? 'selected-error' : ''} ${q3Complete && q3Answer !== 'A' ? 'faded' : ''}`}
+                      onClick={() => handleQ3Answer('A')}
+                      disabled={q3Complete}
+                    >
+                      A) New donations of $3.2M came in during the year
+                    </button>
+                    <button
+                      className={`answer-btn ${q3Answer === 'B' ? 'selected-success' : ''} ${q3Complete && q3Answer !== 'B' ? 'faded' : ''}`}
+                      onClick={() => handleQ3Answer('B')}
+                      disabled={q3Complete}
+                    >
+                      B) Donor conditions on $3.2M of existing contributions were met
+                    </button>
+                  </div>
+
+                  {q3Complete && (
+                    <div className="success-feedback">
+                      <span className="success-icon">✓</span>
+                      <div>
+                        <p className="success-text-title">Correct!</p>
+                        <p className="success-text-body">
+                          "Released from restrictions" is a reclassification, not new revenue. When
+                          donor conditions are met, the amount moves from With Donor Restrictions to
+                          Without Donor Restrictions. The positive and negative entries cancel out —
+                          total net assets are unchanged by this line.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {!q3Complete && (
+                    <button className="hint-btn" onClick={handleQ3Hint}>
+                      💡 Hint {q3Hints + 1}/3
+                    </button>
+                  )}
+
+                  {q3Hints > 0 && !q3Complete && (
+                    <div className="hint-box">
+                      {q3Hints === 1 &&
+                        'Notice the amounts cancel out — positive in one column, negative in the other. Is new money entering the organization?'}
+                      {q3Hints === 2 &&
+                        'This is a reclassification between categories. The total doesn\'t change.'}
+                      {q3Hints === 3 &&
+                        'Think: are these new donations, or existing donations whose conditions have been met?'}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  className="continue-btn"
+                  onClick={() => {
+                    setPhase('phase4');
+                    playContinueClick();
+                  }}
+                  disabled={!q3Complete}
+                  style={{ background: q3Complete ? colors.primary : '#ccc' }}
+                >
+                  Continue
+                </button>
+              </div>
+            )}
+
+            {/* Phase 4: Cross-Statement Articulation */}
+            {phase === 'phase4' && (
+              <div className="phase-container">
+                <div className="card">
+                  <h2>How the Statement of Activities Connects Everything</h2>
+                  <p>
+                    The nonprofit financial report is a system of connected statements. The Statement
+                    of Activities is the bridge:
+                  </p>
+                  <div className="code-box">
+                    <div>
+                      <strong>Statement of Financial Position (Last Year End):</strong>
+                    </div>
+                    <div style={{ marginLeft: '20px' }}>Beginning Net Assets = $102,377,705</div>
+                    <div style={{ marginTop: '16px' }}>
+                      <strong>Statement of Activities (This Year):</strong>
+                    </div>
+                    <div style={{ marginLeft: '20px' }}>Change in Net Assets = $4,011,032</div>
+                    <div style={{ marginTop: '16px' }}>
+                      <strong>Statement of Financial Position (This Year End):</strong>
+                    </div>
+                    <div style={{ marginLeft: '20px' }}>
+                      Ending Net Assets = Beginning + Change = $102,377,705 + $4,011,032 =
+                      $106,388,737
+                    </div>
+                  </div>
+                  <p>
+                    The Statement of Activities explains WHY net assets changed from $102.4M to
+                    $106.4M: revenues exceeded expenses by $4.0M.
+                  </p>
+                </div>
+
+                {/* Question 4 */}
+                <div className="question-section">
+                  <h3>Question 4</h3>
+                  <p>
+                    Which pair of statements does the Statement of Activities connect?
+                  </p>
+
+                  <div className="answer-options">
+                    <button
+                      className={`answer-btn ${q4Answer === 'A' ? 'selected-error' : ''} ${q4Complete && q4Answer !== 'A' ? 'faded' : ''}`}
+                      onClick={() => handleQ4Answer('A')}
+                      disabled={q4Complete}
+                    >
+                      A) It stands alone — it's an independent report
+                    </button>
+                    <button
+                      className={`answer-btn ${q4Answer === 'B' ? 'selected-success' : ''} ${q4Complete && q4Answer !== 'B' ? 'faded' : ''}`}
+                      onClick={() => handleQ4Answer('B')}
+                      disabled={q4Complete}
+                    >
+                      B) It connects two consecutive Statements of Financial Position by explaining
+                      what changed
+                    </button>
+                  </div>
+
+                  {q4Complete && (
+                    <div className="success-feedback">
+                      <span className="success-icon">✓</span>
+                      <div>
+                        <p className="success-text-title">Correct!</p>
+                        <p className="success-text-body">
+                          The Statement of Activities bridges two consecutive Statements of Financial
+                          Position. Beginning net assets (from last year's statement) plus the change in
+                          net assets (from this year's activities) equals ending net assets (on this
+                          year's statement). The three statements form a connected system.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {!q4Complete && (
+                    <button className="hint-btn" onClick={handleQ4Hint}>
+                      💡 Hint {q4Hints + 1}/3
+                    </button>
+                  )}
+
+                  {q4Hints > 0 && !q4Complete && (
+                    <div className="hint-box">
+                      {q4Hints === 1 &&
+                        'The Statement of Financial Position is a snapshot at a point in time. The Statement of Activities covers a period. How might they relate?'}
+                      {q4Hints === 2 &&
+                        'Beginning net assets + Change in net assets = Ending net assets. Where do beginning/ending appear?'}
+                      {q4Hints === 3 &&
+                        'Think of it as a bridge: it explains why the ending balance is different from the beginning balance.'}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  className="continue-btn"
+                  onClick={() => {
+                    setPhase('phase5');
+                    playContinueClick();
+                  }}
+                  disabled={!q4Complete}
+                  style={{ background: q4Complete ? colors.primary : '#ccc' }}
+                >
+                  Continue
+                </button>
+              </div>
+            )}
+
+            {/* Phase 5: Financial Health Analysis */}
+            {phase === 'phase5' && (
+              <div className="phase-container">
+                <div className="card">
+                  <h2>Understanding vs. Analysis: Is $4M Good?</h2>
+                  <p>
+                    OHS's change in net assets was positive: $4,011,032. The Statement of Activities
+                    SHOWS us this number. But does it mean the organization is financially healthy?
+                  </p>
+                  <div className="warning-box">
+                    <p className="warning-box-title">Key Distinction</p>
+                    <p>
+                      <strong>Understanding:</strong> The number tells us net assets grew by $4.0M.
+                      That's what it represents.
+                    </p>
+                    <p>
+                      <strong>Analysis:</strong> Whether that's "good" requires comparing to budget,
+                      multi-year trends, and understanding what form those assets take.
+                    </p>
+                  </div>
+                  <p>
+                    We've focused on understanding — what the financial statements REPRESENT. Analysis
+                    (determining whether financial health is good or not) requires more tools beyond
+                    this tutorial series.
+                  </p>
+                </div>
+
+                {/* Question 5 */}
+                <div className="question-section">
+                  <h3>Question 5: Reflection</h3>
+                  <p>
+                    OHS's change in net assets was positive — $4.0 million. Does this mean the
+                    organization is financially healthy? What else might you want to know?
+                  </p>
+
+                  <textarea
+                    value={q5Input}
+                    onChange={(e) => setQ5Input(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && !q5Complete) { e.preventDefault(); handleQ5Submit(); } }}
+                    disabled={q5Complete}
+                    placeholder="Type your response here..."
+                  />
+
+                  {q5Feedback && (
+                    <p className="feedback-error">{q5Feedback}</p>
+                  )}
+
+                  <button
+                    onClick={handleQ5Submit}
+                    disabled={q5Complete || q5Input.trim() === ''}
+                    style={{
+                      marginTop: '12px',
+                      background: colors.primary,
+                      color: 'white',
+                      border: 'none',
+                      padding: '10px 16px',
+                      borderRadius: '6px',
+                      cursor: q5Complete || q5Input.trim() === '' ? 'default' : 'pointer',
+                      fontWeight: '600',
+                      fontFamily: 'inherit',
+                      fontSize: '15px',
+                    }}
+                  >
+                    Submit
+                  </button>
+
+                  {q5Complete && (
+                    <div className="success-feedback">
+                      <span className="success-icon">✓</span>
+                      <div>
+                        <p className="success-text-title">Great Reflection!</p>
+                        <p className="success-text-body">
+                          A positive change in net assets tells you net assets grew during the period
+                          — but it doesn't tell you about financial health. The surplus might be in
+                          non-cash forms (like donated property). Cash could have actually decreased.
+                          Understanding what the number represents is what this tutorial teaches; deeper
+                          analysis comes next.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  className="continue-btn"
+                  onClick={() => {
+                    setPhase('complete');
+                    playContinueClick();
+                  }}
+                  disabled={!q5Complete}
+                  style={{ background: q5Complete ? colors.primary : '#ccc' }}
+                >
+                  Finish
+                </button>
+              </div>
+            )}
+
+            {/* Complete Phase */}
+            {phase === 'complete' && (
+              <div className="complete-section">
+                <span className="complete-icon">🏆</span>
+                <h2>You've Completed Tutorial 3!</h2>
+
+                <div className="complete-success-box">
+                  <h3>What You Discovered</h3>
+                  <ol>
+                    <li>
+                      The Statement of Activities is the nonprofit "income statement" — it shows how
+                      net assets changed
+                    </li>
+                    <li>
+                      Revenue/Support minus Expenses equals Change in Net Assets (not "Net Income")
+                    </li>
+                    <li>
+                      "Released from restrictions" is a reclassification between columns, not new money
+                    </li>
+                    <li>
+                      The Statement of Activities bridges two consecutive Statements of Financial
+                      Position
+                    </li>
+                    <li>
+                      A positive change in net assets doesn't automatically mean financial health
+                    </li>
+                  </ol>
+                </div>
+
+                <div className="complete-next-box">
+                  <h3>Coming Next</h3>
+                  <p><strong>Tutorial 4 — Statement of Cash Flows</strong></p>
+                  <p>Why did cash change differently from net assets?</p>
+                </div>
+
+                <div className="complete-buttons">
+                  <a href="NFP-Tutorial-4-Cash-Flows.html" style={{ textDecoration: 'none' }}>
+                    <button className="complete-btn accent">
+                      → Next Tutorial
+                    </button>
+                  </a>
+                  <button className="complete-btn" onClick={restart}>
+                    ↺ Restart
+                  </button>
+                </div>
+
+                {devMode && (
+                  <div className="dev-mode">
+                    <p>DEV MODE</p>
+                    <p>Phase: {phase}</p>
+                    <p>devMode: {devMode ? 'true' : 'false'}</p>
+                    <p>headerClickCount: {tripleTaps}</p>
+                    <p>All questions complete: {allQuestionsComplete ? 'true' : 'false'}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </main>
+        </div>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<NFPTutorial3 />);
+  </script>
+</body>
+</html>

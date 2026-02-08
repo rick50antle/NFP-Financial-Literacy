@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial 0: The System of Financial Statements</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const NFPTutorial0 = () => {
+            const [phase, setPhase] = useState('welcome');
+            const [soundOn, setSoundOn] = useState(true);
+            const [devMode, setDevMode] = useState(false);
+            const [headerClickCount, setHeaderClickCount] = useState(0);
+            const [glossaryOpen, setGlossaryOpen] = useState(false);
+
+            const colors = {
+                primary: '#00356b',
+                sand: '#f5f1e8',
+                earth: '#8b7355',
+                earthLight: '#d4c4a8',
+                earthDark: '#5c4d3d',
+                accent: '#c9a227',
+                clay: '#c4a574',
+                clayLight: '#e8dcc8',
+                clayDark: '#a08050',
+                success: '#22c55e',
+                successBg: '#f0fdf4',
+                warning: '#f59e0b',
+                warningBg: '#fffbeb',
+                error: '#dc2626',
+                errorBg: '#fef2f2',
+            };
+
+            const phaseSequence = ['welcome', 'phase1', 'phase2', 'phase3', 'phase4', 'phase5', 'complete'];
+
+            const playContinueClick = () => {
+                if (!soundOn) return;
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    oscillator.connect(gain);
+                    gain.connect(audioContext.destination);
+                    oscillator.frequency.value = 600;
+                    gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + 0.15);
+                } catch (e) {}
+            };
+
+            const handleHeaderClick = () => {
+                const newCount = headerClickCount + 1;
+                setHeaderClickCount(newCount);
+                if (newCount >= 3) {
+                    setDevMode(!devMode);
+                    setHeaderClickCount(0);
+                }
+                setTimeout(() => setHeaderClickCount(0), 600);
+            };
+
+            // Header
+            const Header = () => {
+                const currentIndex = phaseSequence.indexOf(phase);
+                const progress = ((currentIndex) / (phaseSequence.length - 1)) * 100;
+
+                return (
+                    <div style={{ backgroundColor: colors.primary, padding: '16px 24px', marginBottom: '0', position: 'relative' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: devMode ? '12px' : '0' }}>
+                            <h1
+                                onClick={handleHeaderClick}
+                                style={{ color: 'white', margin: 0, fontSize: '18px', cursor: 'default', userSelect: 'none' }}
+                            >
+                                Tutorial 0: The System of Financial Statements
+                            </h1>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                <button
+                                    onClick={() => setGlossaryOpen(true)}
+                                    style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.3)', color: 'white', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                                >
+                                    📖 Glossary
+                                </button>
+                                <button
+                                    onClick={() => { setPhase('welcome'); }}
+                                    style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.3)', color: 'white', padding: '4px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '14px' }}
+                                >
+                                    ↺ Restart
+                                </button>
+                            </div>
+                        </div>
+                        <div style={{ height: '4px', backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '2px', marginTop: '12px' }}>
+                            <div style={{ height: '100%', width: `${progress}%`, backgroundColor: colors.accent, borderRadius: '2px', transition: 'width 0.3s ease' }} />
+                        </div>
+                        {devMode && (
+                            <div style={{ marginTop: '10px' }}>
+                                <span style={{ color: colors.accent, fontSize: '12px', marginRight: '8px' }}>Dev Mode: Skip to phase</span>
+                                {phaseSequence.map((p, i) => (
+                                    <button
+                                        key={p}
+                                        onClick={() => setPhase(p)}
+                                        style={{
+                                            background: phase === p ? colors.accent : 'transparent',
+                                            color: 'white',
+                                            border: '1px solid rgba(255,255,255,0.3)',
+                                            padding: '2px 8px',
+                                            borderRadius: '3px',
+                                            cursor: 'pointer',
+                                            fontSize: '11px',
+                                            marginRight: '4px',
+                                        }}
+                                    >
+                                        {p}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                );
+            };
+
+            // Sound Toggle
+            const SoundToggle = () => (
+                <button
+                    onClick={() => setSoundOn(!soundOn)}
+                    style={{
+                        position: 'absolute',
+                        top: '16px',
+                        right: '16px',
+                        background: colors.sand,
+                        border: 'none',
+                        padding: '8px',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '20px',
+                        zIndex: 100,
+                    }}
+                    title={soundOn ? "Sound On" : "Sound Off"}
+                >
+                    {soundOn ? '🔊' : '🔇'}
+                </button>
+            );
+
+            // Container
+            const Container = ({ children, maxWidth }) => (
+                <div style={{ maxWidth: maxWidth || '900px', margin: '0 auto', padding: '40px 20px' }}>
+                    {children}
+                </div>
+            );
+
+            // Continue Button
+            const ContinueButton = ({ onClick, label }) => (
+                <button
+                    onClick={() => { playContinueClick(); onClick(); }}
+                    style={{
+                        marginTop: '24px',
+                        padding: '12px 32px',
+                        backgroundColor: colors.accent,
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        display: 'block',
+                    }}
+                >
+                    {label || 'Continue →'}
+                </button>
+            );
+
+            // Glossary Modal
+            const GlossaryModal = () => {
+                if (!glossaryOpen) return null;
+                return (
+                    <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ backgroundColor: 'white', borderRadius: '8px', padding: '32px', maxWidth: '600px', width: '90%', maxHeight: '80vh', overflowY: 'auto' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                <h2 style={{ margin: 0, color: colors.primary }}>Glossary</h2>
+                                <button onClick={() => setGlossaryOpen(false)} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>✕</button>
+                            </div>
+                            <div style={{ fontSize: '14px', lineHeight: '1.6', color: colors.earthDark }}>
+                                <p><strong>Accounting Identity:</strong> Assets − Liabilities = ?? — where the right side conveys information about the recorded assets and liabilities. For for-profits, it becomes Equities; for nonprofits, Net Assets.</p>
+                                <p><strong>Equities:</strong> For for-profit entities: the DEFINITIONAL difference between recorded assets and liabilities. Plural form is deliberate — it is a category label, not a single coherent economic thing.</p>
+                                <p><strong>Statement of Financial Position:</strong> A snapshot of recorded assets, liabilities, and net assets at a single point in time. The nonprofit equivalent of a balance sheet.</p>
+                                <p><strong>Statement of Activities:</strong> Explains what caused net assets to change during a period — revenues, expenses, and reclassifications between restricted and unrestricted categories.</p>
+                                <p><strong>Statement of Cash Flows:</strong> A reconciliation between the change in net assets and the change in cash. Explains why those two numbers differ.</p>
+                                <p><strong>Statement of Functional Expenses:</strong> Breaks down expenses by function — program services, management and general, and fundraising. Unique to nonprofits.</p>
+                                <p><strong>Net Assets:</strong> The DEFINITIONAL difference between recorded assets and recorded liabilities. For nonprofits, tracks the status of donor restrictions on accumulated contributions.</p>
+                                <p><strong>With Donor Restrictions:</strong> Net assets from contributions that came with donor-imposed restrictions that have NOT yet been satisfied.</p>
+                                <p><strong>Without Donor Restrictions:</strong> Net assets from contributions that either never had donor restrictions, or had restrictions that HAVE been satisfied.</p>
+                                <p><strong>Board Designation:</strong> A statement of intent by the board for specific uses of unrestricted resources. NOT a binding restriction — the board can change its mind at any meeting.</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            // ── WELCOME ──
+            const WelcomePhase = () => {
+                const [aiTransparencyOpen, setAiTransparencyOpen] = useState(false);
+
+                return (
+                    <Container>
+                        <div style={{ backgroundColor: colors.sand, padding: '32px', borderRadius: '8px', marginBottom: '24px' }}>
+                            <h2 style={{ color: colors.primary, marginTop: 0 }}>Before You Dive In</h2>
+                            <p style={{ fontSize: '16px', lineHeight: '1.6', color: colors.earthDark }}>
+                                This overview builds a mental map of how nonprofit financial statements fit together as a system.
+                                There are no questions here — just a guided walkthrough that shows you the architecture before you explore each piece in detail.
+                            </p>
+                            <div style={{ marginTop: '16px' }}>
+                                <p style={{ marginBottom: '12px' }}>
+                                    <strong>What you'll see:</strong>
+                                </p>
+                                <p style={{ color: colors.earthDark, lineHeight: '1.6', fontSize: '15px' }}>
+                                    Nonprofits produce several financial statements, and the way they're usually presented — each on its own page, with columns comparing this year to last year — can make it hard to see how they connect. This overview reveals the real structure: two snapshots connected by statements that explain what happened in between.
+                                </p>
+                            </div>
+                            <p style={{ color: colors.earthDark, lineHeight: '1.6', fontSize: '15px', marginTop: '16px' }}>
+                                This overview uses real financial data from <strong>LEAP</strong> (Leadership, Education & Athletics in Partnership), a New Haven nonprofit youth service organization.
+                            </p>
+                        </div>
+
+                        <div style={{ marginBottom: '24px' }}>
+                            <button
+                                onClick={() => setAiTransparencyOpen(!aiTransparencyOpen)}
+                                style={{
+                                    background: 'none',
+                                    border: `1px solid ${colors.earthLight}`,
+                                    padding: '8px 16px',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '13px',
+                                    color: colors.earth,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                }}
+                            >
+                                {aiTransparencyOpen ? '▼' : '▶'} AI Transparency Note
+                            </button>
+                            {aiTransparencyOpen && (
+                                <div style={{ marginTop: '8px', padding: '12px', backgroundColor: '#f0f4f8', borderRadius: '6px', fontSize: '13px', color: colors.earthDark, lineHeight: '1.5' }}>
+                                    <p style={{ margin: '0 0 8px 0' }}>This tutorial was created with AI assistance (Rick2.0, powered by Claude). AI systems can make mistakes. This is a learning aid, not a replacement for professional instruction. Verify important concepts with your instructor or course materials.</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <ContinueButton onClick={() => setPhase('phase1')} label="Let's Begin →" />
+                    </Container>
+                );
+            };
+
+            // ── PHASE 1: From the Familiar Identity to Nonprofits ──
+            const Phase1 = () => (
+                <Container>
+                    <h2 style={{ color: colors.primary, marginBottom: '20px' }}>Starting from What You Know</h2>
+
+                    <p style={{ fontSize: '16px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '24px' }}>
+                        If you know for-profit accounting, you already carry a powerful framework in your head:
+                    </p>
+
+                    {/* Step 1: The familiar form */}
+                    <div style={{ textAlign: 'center', padding: '24px', backgroundColor: colors.sand, borderRadius: '8px', marginBottom: '24px' }}>
+                        <p style={{ fontSize: '24px', fontWeight: 'bold', color: colors.primary, margin: 0 }}>
+                            Assets = Liabilities + Equities
+                        </p>
+                        <p style={{ fontSize: '14px', color: colors.earth, marginTop: '8px', marginBottom: 0 }}>
+                            The accounting identity you learned in your first course.
+                        </p>
+                    </div>
+
+                    {/* Step 2: The puzzle */}
+                    <div style={{ padding: '20px', backgroundColor: colors.warningBg, borderLeft: `4px solid ${colors.warning}`, borderRadius: '4px', marginBottom: '24px' }}>
+                        <h3 style={{ margin: '0 0 10px 0', color: colors.earthDark, fontSize: '15px' }}>But here's the puzzle...</h3>
+                        <p style={{ margin: 0, fontSize: '15px', color: colors.earthDark, lineHeight: '1.6' }}>
+                            Nonprofits have assets — cash, buildings, receivables. They have liabilities — payables, obligations. But they don't have equities. There are no owners. No one holds stock or claims a residual interest. So how can this framework apply to a nonprofit?
+                        </p>
+                    </div>
+
+                    {/* Step 3: Rearrange */}
+                    <p style={{ fontSize: '15px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '16px' }}>
+                        The first step is to rearrange the identity, gathering the things that for-profits and nonprofits share on one side:
+                    </p>
+
+                    <div style={{ textAlign: 'center', padding: '24px', backgroundColor: colors.sand, borderRadius: '8px', marginBottom: '24px' }}>
+                        <p style={{ fontSize: '14px', color: colors.earth, margin: '0 0 8px 0' }}>
+                            Both for-profits and nonprofits have assets and liabilities, so move them to the left:
+                        </p>
+                        <p style={{ fontSize: '24px', fontWeight: 'bold', color: colors.primary, margin: 0 }}>
+                            Assets − Liabilities = <span style={{ color: colors.accent }}>??</span>
+                        </p>
+                        <p style={{ fontSize: '14px', color: colors.earth, marginTop: '8px', marginBottom: 0 }}>
+                            What goes on the right side? It depends on the type of entity.
+                        </p>
+                    </div>
+
+                    {/* Step 4: The insight — information about the left side */}
+                    <div style={{ padding: '20px', backgroundColor: '#eef2ff', borderLeft: `4px solid ${colors.primary}`, borderRadius: '4px', marginBottom: '24px' }}>
+                        <h3 style={{ margin: '0 0 10px 0', color: colors.primary, fontSize: '15px' }}>The key insight</h3>
+                        <p style={{ margin: 0, fontSize: '15px', color: colors.earthDark, lineHeight: '1.6' }}>
+                            The right side of the identity is not a separate "thing." It is the DEFINITIONAL difference between assets and liabilities — and it becomes a place to convey <strong>information about</strong> those assets and liabilities. What kind of information? That depends on what questions matter most for the entity.
+                        </p>
+                    </div>
+
+                    {/* Step 5: Side-by-side — what information each entity type conveys */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                        <div style={{ padding: '20px', backgroundColor: 'white', border: `2px solid ${colors.earthLight}`, borderRadius: '8px' }}>
+                            <h3 style={{ color: colors.earthDark, margin: '0 0 12px 0', fontSize: '15px' }}>FOR-PROFIT</h3>
+                            <p style={{ fontSize: '18px', fontWeight: 'bold', color: colors.accent, margin: '0 0 12px 0' }}>Equities</p>
+                            <p style={{ fontSize: '14px', color: colors.earthDark, lineHeight: '1.5', margin: '0 0 12px 0' }}>
+                                The right side conveys information about <strong>ownership sources</strong>:
+                            </p>
+                            <p style={{ fontSize: '13px', color: colors.earthDark, lineHeight: '1.5', margin: 0 }}>
+                                ├─ Contributed Capital<br />
+                                <span style={{ fontSize: '12px', color: colors.earth }}>&nbsp;&nbsp;&nbsp;&nbsp;(what owners invested)</span><br />
+                                └─ Retained Earnings<br />
+                                <span style={{ fontSize: '12px', color: colors.earth }}>&nbsp;&nbsp;&nbsp;&nbsp;(what was recorded as earned)</span>
+                            </p>
+                        </div>
+                        <div style={{ padding: '20px', backgroundColor: colors.primary, borderRadius: '8px' }}>
+                            <h3 style={{ color: 'rgba(255,255,255,0.7)', margin: '0 0 12px 0', fontSize: '15px' }}>NONPROFIT</h3>
+                            <p style={{ fontSize: '18px', fontWeight: 'bold', color: colors.accent, margin: '0 0 12px 0' }}>Net Assets</p>
+                            <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.9)', lineHeight: '1.5', margin: '0 0 12px 0' }}>
+                                The right side conveys information about <strong>donor restriction status</strong>:
+                            </p>
+                            <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)', lineHeight: '1.5', margin: 0 }}>
+                                ├─ Without Donor Restrictions<br />
+                                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>&nbsp;&nbsp;&nbsp;&nbsp;(no restrictions, or satisfied)</span><br />
+                                └─ With Donor Restrictions<br />
+                                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.6)' }}>&nbsp;&nbsp;&nbsp;&nbsp;(restrictions not yet satisfied)</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Step 6: The punchline */}
+                    <div style={{ padding: '20px', backgroundColor: '#e8d9f0', borderLeft: '4px solid #9370db', borderRadius: '4px', marginBottom: '24px' }}>
+                        <h3 style={{ margin: '0 0 10px 0', color: '#5b2d8e', fontSize: '15px' }}>What nonprofits reveal</h3>
+                        <p style={{ margin: 0, fontSize: '15px', color: colors.earthDark, lineHeight: '1.6' }}>
+                            The right side of the identity was never a "thing" — it was always an information device. In for-profit accounting, that can be easy to miss because Equities <em>feels</em> like something the owners have. Nonprofit accounting makes the real function visible: the right side exists to organize and convey information about the recorded assets and liabilities on the left side.
+                        </p>
+                    </div>
+
+                    <p style={{ fontSize: '15px', color: colors.earthDark, lineHeight: '1.6' }}>
+                        The <strong>Statement of Financial Position</strong> applies this identity at a single point in time. It's a snapshot — an accounting picture of what has been recorded as of a specific date.
+                    </p>
+
+                    <ContinueButton onClick={() => setPhase('phase2')} />
+                </Container>
+            );
+
+            // ── PHASE 2: Beginning-of-Year Picture ──
+            const Phase2 = () => (
+                <Container maxWidth="1000px">
+                    <h2 style={{ color: colors.primary, marginBottom: '8px' }}>The Beginning Picture</h2>
+                    <p style={{ fontSize: '14px', color: colors.earth, marginBottom: '24px' }}>
+                        LEAP — Statement of Financial Position as of August 31, 2023
+                    </p>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                        {/* Left: The Statement */}
+                        <div style={{ backgroundColor: 'white', border: `1px solid ${colors.earthLight}`, borderRadius: '8px', padding: '20px' }}>
+                            <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse', color: colors.earthDark }}>
+                                <tbody>
+                                    <tr><td colSpan="2" style={{ fontWeight: 'bold', paddingTop: '8px', paddingBottom: '4px' }}>Assets</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Cash and cash equivalents</td><td style={{ textAlign: 'right' }}>$3,530,228</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Grants receivable</td><td style={{ textAlign: 'right' }}>845,969</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Promises to give</td><td style={{ textAlign: 'right' }}>520,806</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Prepaid expenses</td><td style={{ textAlign: 'right' }}>32,863</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Property and equipment, net</td><td style={{ textAlign: 'right' }}>524,295</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Promises to give, noncurrent</td><td style={{ textAlign: 'right' }}>500,000</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Investments</td><td style={{ textAlign: 'right' }}>161,453</td></tr>
+                                    <tr style={{ borderTop: '2px solid ' + colors.earthDark }}><td style={{ fontWeight: 'bold', paddingTop: '6px' }}>Total Assets</td><td style={{ textAlign: 'right', fontWeight: 'bold', paddingTop: '6px' }}>$6,115,614</td></tr>
+
+                                    <tr><td colSpan="2" style={{ height: '16px' }}></td></tr>
+                                    <tr><td colSpan="2" style={{ fontWeight: 'bold', paddingBottom: '4px' }}>Liabilities</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Accounts payable and accrued expenses</td><td style={{ textAlign: 'right' }}>$229,169</td></tr>
+                                    <tr style={{ borderTop: '2px solid ' + colors.earthDark }}><td style={{ fontWeight: 'bold', paddingTop: '6px' }}>Total Liabilities</td><td style={{ textAlign: 'right', fontWeight: 'bold', paddingTop: '6px' }}>$229,169</td></tr>
+
+                                    <tr><td colSpan="2" style={{ height: '16px' }}></td></tr>
+                                    <tr><td colSpan="2" style={{ fontWeight: 'bold', paddingBottom: '4px' }}>Net Assets</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Without donor restrictions</td><td style={{ textAlign: 'right' }}></td></tr>
+                                    <tr><td style={{ paddingLeft: '24px', fontSize: '12px' }}>Board designated</td><td style={{ textAlign: 'right', fontSize: '12px' }}>900,000</td></tr>
+                                    <tr><td style={{ paddingLeft: '24px', fontSize: '12px' }}>Undesignated</td><td style={{ textAlign: 'right', fontSize: '12px' }}>3,590,059</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}></td><td style={{ textAlign: 'right', borderTop: '1px solid ' + colors.earth }}>4,490,059</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>With donor restrictions</td><td style={{ textAlign: 'right' }}>1,396,386</td></tr>
+                                    <tr style={{ borderTop: '2px solid ' + colors.earthDark }}><td style={{ fontWeight: 'bold', paddingTop: '6px' }}>Total Net Assets</td><td style={{ textAlign: 'right', fontWeight: 'bold', paddingTop: '6px' }}>$5,886,445</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Right: What this shows */}
+                        <div>
+                            <div style={{ backgroundColor: colors.sand, borderRadius: '8px', padding: '20px', marginBottom: '16px' }}>
+                                <h3 style={{ color: colors.primary, margin: '0 0 12px 0', fontSize: '15px' }}>The Identity at Work</h3>
+                                <div style={{ textAlign: 'center', padding: '12px', backgroundColor: 'white', borderRadius: '6px' }}>
+                                    <p style={{ fontSize: '14px', margin: '0 0 4px 0', color: colors.earthDark }}>
+                                        <strong>$6,115,614</strong> − <strong>$229,169</strong> = <strong style={{ color: colors.accent }}>$5,886,445</strong>
+                                    </p>
+                                    <p style={{ fontSize: '12px', color: colors.earth, margin: 0 }}>
+                                        Assets − Liabilities = Net Assets
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div style={{ padding: '16px', backgroundColor: '#eef2ff', borderLeft: `4px solid ${colors.primary}`, borderRadius: '4px', marginBottom: '16px' }}>
+                                <p style={{ margin: 0, fontSize: '13px', color: colors.earthDark, lineHeight: '1.5' }}>
+                                    <strong>This is a snapshot</strong> — what LEAP's accounting records showed on August 31, 2023. It captures recorded assets and obligations, but necessarily excludes things like LEAP's reputation in the community, the skills of its staff, or the relationships it has built with families and funders.
+                                </p>
+                            </div>
+
+                            <div style={{ padding: '16px', backgroundColor: colors.warningBg, borderLeft: `4px solid ${colors.warning}`, borderRadius: '4px' }}>
+                                <p style={{ margin: 0, fontSize: '13px', color: colors.earthDark, lineHeight: '1.5' }}>
+                                    <strong>Notice the Net Assets breakdown:</strong> Of the $5.9M total, about $4.5M is Without Donor Restrictions and $1.4M is With Donor Restrictions. These categories track the status of donor restrictions — not how much is available to spend.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p style={{ fontSize: '15px', color: colors.earthDark, lineHeight: '1.6' }}>
+                        Think of this as a photograph. It captures one moment. But a photograph doesn't tell you what happened next. For that, you need the rest of the story.
+                    </p>
+
+                    <ContinueButton onClick={() => setPhase('phase3')} />
+                </Container>
+            );
+
+            // ── PHASE 3: End-of-Year Picture ──
+            const Phase3 = () => (
+                <Container maxWidth="1000px">
+                    <h2 style={{ color: colors.primary, marginBottom: '8px' }}>The Ending Picture</h2>
+                    <p style={{ fontSize: '14px', color: colors.earth, marginBottom: '24px' }}>
+                        LEAP — Statement of Financial Position as of August 31, 2024 — one year later
+                    </p>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+                        {/* Left: The Statement */}
+                        <div style={{ backgroundColor: 'white', border: `1px solid ${colors.earthLight}`, borderRadius: '8px', padding: '20px' }}>
+                            <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse', color: colors.earthDark }}>
+                                <tbody>
+                                    <tr><td colSpan="2" style={{ fontWeight: 'bold', paddingTop: '8px', paddingBottom: '4px' }}>Assets</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Cash and cash equivalents</td><td style={{ textAlign: 'right' }}>$4,977,097</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Grants receivable</td><td style={{ textAlign: 'right' }}>438,453</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Promises to give</td><td style={{ textAlign: 'right' }}>570,238</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Short-term investments</td><td style={{ textAlign: 'right' }}>250,303</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Prepaid expenses</td><td style={{ textAlign: 'right' }}>50,661</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Property and equipment, net</td><td style={{ textAlign: 'right' }}>678,339</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Promises to give, noncurrent</td><td style={{ textAlign: 'right' }}>60,000</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Investments</td><td style={{ textAlign: 'right' }}>162,697</td></tr>
+                                    <tr style={{ borderTop: '2px solid ' + colors.earthDark }}><td style={{ fontWeight: 'bold', paddingTop: '6px' }}>Total Assets</td><td style={{ textAlign: 'right', fontWeight: 'bold', paddingTop: '6px' }}>$7,187,788</td></tr>
+
+                                    <tr><td colSpan="2" style={{ height: '16px' }}></td></tr>
+                                    <tr><td colSpan="2" style={{ fontWeight: 'bold', paddingBottom: '4px' }}>Liabilities</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Accounts payable and accrued expenses</td><td style={{ textAlign: 'right' }}>$215,013</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Refundable advances</td><td style={{ textAlign: 'right' }}>106,427</td></tr>
+                                    <tr style={{ borderTop: '2px solid ' + colors.earthDark }}><td style={{ fontWeight: 'bold', paddingTop: '6px' }}>Total Liabilities</td><td style={{ textAlign: 'right', fontWeight: 'bold', paddingTop: '6px' }}>$321,440</td></tr>
+
+                                    <tr><td colSpan="2" style={{ height: '16px' }}></td></tr>
+                                    <tr><td colSpan="2" style={{ fontWeight: 'bold', paddingBottom: '4px' }}>Net Assets</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>Without donor restrictions</td><td style={{ textAlign: 'right' }}></td></tr>
+                                    <tr><td style={{ paddingLeft: '24px', fontSize: '12px' }}>Board designated</td><td style={{ textAlign: 'right', fontSize: '12px' }}>900,000</td></tr>
+                                    <tr><td style={{ paddingLeft: '24px', fontSize: '12px' }}>Undesignated</td><td style={{ textAlign: 'right', fontSize: '12px' }}>4,844,765</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}></td><td style={{ textAlign: 'right', borderTop: '1px solid ' + colors.earth }}>5,744,765</td></tr>
+                                    <tr><td style={{ paddingLeft: '12px' }}>With donor restrictions</td><td style={{ textAlign: 'right' }}>1,121,583</td></tr>
+                                    <tr style={{ borderTop: '2px solid ' + colors.earthDark }}><td style={{ fontWeight: 'bold', paddingTop: '6px' }}>Total Net Assets</td><td style={{ textAlign: 'right', fontWeight: 'bold', paddingTop: '6px' }}>$6,866,348</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* Right: What changed */}
+                        <div>
+                            <div style={{ backgroundColor: colors.sand, borderRadius: '8px', padding: '20px', marginBottom: '16px' }}>
+                                <h3 style={{ color: colors.primary, margin: '0 0 16px 0', fontSize: '15px' }}>What Changed?</h3>
+
+                                <div style={{ padding: '12px', backgroundColor: 'white', borderRadius: '6px', marginBottom: '12px' }}>
+                                    <p style={{ fontSize: '13px', color: colors.earth, margin: '0 0 4px 0' }}>Change in Net Assets:</p>
+                                    <p style={{ fontSize: '16px', fontWeight: 'bold', color: colors.primary, margin: 0 }}>
+                                        $6,866,348 − $5,886,445 = <span style={{ color: colors.success }}>+$979,903</span>
+                                    </p>
+                                    <p style={{ fontSize: '12px', color: colors.earth, margin: '4px 0 0 0', fontStyle: 'italic' }}>
+                                        The Statement of Activities will explain this.
+                                    </p>
+                                </div>
+
+                                <div style={{ padding: '12px', backgroundColor: 'white', borderRadius: '6px' }}>
+                                    <p style={{ fontSize: '13px', color: colors.earth, margin: '0 0 4px 0' }}>Change in Cash:</p>
+                                    <p style={{ fontSize: '16px', fontWeight: 'bold', color: colors.primary, margin: 0 }}>
+                                        $4,977,097 − $3,530,228 = <span style={{ color: colors.success }}>+$1,446,869</span>
+                                    </p>
+                                    <p style={{ fontSize: '12px', color: colors.earth, margin: '4px 0 0 0', fontStyle: 'italic' }}>
+                                        The Statement of Cash Flows will explain this.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div style={{ padding: '16px', backgroundColor: colors.warningBg, borderLeft: `4px solid ${colors.warning}`, borderRadius: '4px' }}>
+                                <p style={{ margin: 0, fontSize: '13px', color: colors.earthDark, lineHeight: '1.5' }}>
+                                    <strong>Two different changes, two different explanations.</strong> Net assets grew by about $980K but cash grew by nearly $1.45M. Why don't these match? The rest of the financial statements exist to answer exactly these kinds of questions.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <ContinueButton onClick={() => setPhase('phase4')} />
+                </Container>
+            );
+
+            // ── PHASE 4: The Statements That Explain the Journey ──
+            const Phase4 = () => (
+                <Container maxWidth="1000px">
+                    <h2 style={{ color: colors.primary, marginBottom: '20px' }}>The Statements That Explain the Journey</h2>
+
+                    <p style={{ fontSize: '15px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '24px' }}>
+                        You now have two snapshots — beginning and ending pictures. Three statements explain how LEAP got from one to the other:
+                    </p>
+
+                    {/* Visual diagram */}
+                    <div style={{ marginBottom: '32px' }}>
+                        {/* Top row: two snapshots */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '12px', alignItems: 'center', marginBottom: '16px' }}>
+                            <div style={{ backgroundColor: colors.primary, color: 'white', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
+                                <p style={{ fontSize: '12px', opacity: 0.7, margin: '0 0 4px 0' }}>Aug 31, 2023</p>
+                                <p style={{ fontWeight: 'bold', margin: '0 0 4px 0', fontSize: '14px' }}>Statement of Financial Position</p>
+                                <p style={{ fontSize: '13px', margin: 0 }}>Net Assets: <strong>$5,886,445</strong></p>
+                                <p style={{ fontSize: '13px', margin: 0 }}>Cash: <strong>$3,530,228</strong></p>
+                            </div>
+                            <div style={{ fontSize: '28px', color: colors.accent }}>→</div>
+                            <div style={{ backgroundColor: colors.primary, color: 'white', padding: '16px', borderRadius: '8px', textAlign: 'center' }}>
+                                <p style={{ fontSize: '12px', opacity: 0.7, margin: '0 0 4px 0' }}>Aug 31, 2024</p>
+                                <p style={{ fontWeight: 'bold', margin: '0 0 4px 0', fontSize: '14px' }}>Statement of Financial Position</p>
+                                <p style={{ fontSize: '13px', margin: 0 }}>Net Assets: <strong>$6,866,348</strong></p>
+                                <p style={{ fontSize: '13px', margin: 0 }}>Cash: <strong>$4,977,097</strong></p>
+                            </div>
+                        </div>
+
+                        {/* Label */}
+                        <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+                            <p style={{ fontSize: '13px', color: colors.earth, fontStyle: 'italic', margin: 0 }}>
+                                ▼ These statements explain the changes between the two pictures ▼
+                            </p>
+                        </div>
+
+                        {/* Bottom row: three explanatory statements */}
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', backgroundColor: colors.sand, padding: '16px', borderRadius: '8px' }}>
+                            <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '6px', borderTop: `3px solid ${colors.accent}` }}>
+                                <h4 style={{ color: colors.primary, margin: '0 0 8px 0', fontSize: '13px' }}>Statement of Activities</h4>
+                                <p style={{ fontSize: '12px', color: colors.earthDark, lineHeight: '1.4', margin: 0 }}>
+                                    Explains the <strong>+$979,903</strong> change in net assets. What revenues came in, what expenses went out, and how restrictions were reclassified.
+                                </p>
+                            </div>
+                            <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '6px', borderTop: `3px solid ${colors.accent}` }}>
+                                <h4 style={{ color: colors.primary, margin: '0 0 8px 0', fontSize: '13px' }}>Statement of Cash Flows</h4>
+                                <p style={{ fontSize: '12px', color: colors.earthDark, lineHeight: '1.4', margin: 0 }}>
+                                    Reconciles the change in net assets to the <strong>+$1,446,869</strong> change in cash. Explains why those two numbers differ.
+                                </p>
+                            </div>
+                            <div style={{ backgroundColor: 'white', padding: '16px', borderRadius: '6px', borderTop: `3px solid ${colors.accent}` }}>
+                                <h4 style={{ color: colors.primary, margin: '0 0 8px 0', fontSize: '13px' }}>Statement of Functional Expenses</h4>
+                                <p style={{ fontSize: '12px', color: colors.earthDark, lineHeight: '1.4', margin: 0 }}>
+                                    Breaks down how LEAP's <strong>$6.9M</strong> in expenses were allocated: program services, management, and fundraising.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ padding: '16px', backgroundColor: '#eef2ff', borderLeft: `4px solid ${colors.primary}`, borderRadius: '4px', marginBottom: '24px' }}>
+                        <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark, lineHeight: '1.5' }}>
+                            <strong>This is the real architecture.</strong> Two snapshots of financial position — bookends — with the other statements in between explaining what happened during the year. Every number in the explanatory statements connects back to a change between the beginning and ending pictures.
+                        </p>
+                    </div>
+
+                    <ContinueButton onClick={() => setPhase('phase5')} />
+                </Container>
+            );
+
+            // ── PHASE 5: Why Traditional Presentation Hides This ──
+            const Phase5 = () => (
+                <Container>
+                    <h2 style={{ color: colors.primary, marginBottom: '20px' }}>Why This Structure Is Hard to See</h2>
+
+                    <p style={{ fontSize: '15px', color: colors.earthDark, lineHeight: '1.6', marginBottom: '24px' }}>
+                        If the architecture is so logical, why doesn't it feel obvious when you open a set of financial statements?
+                    </p>
+
+                    <div style={{ backgroundColor: colors.warningBg, borderLeft: `4px solid ${colors.warning}`, borderRadius: '4px', padding: '20px', marginBottom: '24px' }}>
+                        <h3 style={{ color: colors.earthDark, margin: '0 0 12px 0', fontSize: '15px' }}>The problem is how statements are usually presented.</h3>
+                        <p style={{ fontSize: '14px', color: colors.earthDark, lineHeight: '1.6', margin: '0 0 12px 0' }}>
+                            In practice, each statement appears on its own page. The Statement of Financial Position shows this year and last year side by side in columns. The Statement of Activities does the same. The Statement of Cash Flows stands alone on another page.
+                        </p>
+                        <p style={{ fontSize: '14px', color: colors.earthDark, lineHeight: '1.6', margin: 0 }}>
+                            This columnar, comparative format is convenient for spotting year-over-year changes within a single statement. But it hides the temporal logic of the system — the fact that the Statement of Activities and the Statement of Cash Flows exist to explain how you got from one Statement of Financial Position to the next.
+                        </p>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '24px' }}>
+                        <div style={{ padding: '20px', backgroundColor: colors.errorBg, borderRadius: '8px', border: `1px solid ${colors.error}` }}>
+                            <h4 style={{ color: colors.error, margin: '0 0 10px 0', fontSize: '14px' }}>How They're Usually Presented</h4>
+                            <p style={{ fontSize: '13px', color: colors.earthDark, lineHeight: '1.5', margin: 0 }}>
+                                Separate pages. Columnar comparisons. Each statement appears self-contained. The reader sees four documents, not a connected system.
+                            </p>
+                        </div>
+                        <div style={{ padding: '20px', backgroundColor: colors.successBg, borderRadius: '8px', border: `1px solid ${colors.success}` }}>
+                            <h4 style={{ color: colors.success, margin: '0 0 10px 0', fontSize: '14px' }}>The Real Structure</h4>
+                            <p style={{ fontSize: '13px', color: colors.earthDark, lineHeight: '1.5', margin: 0 }}>
+                                Beginning picture → explanatory statements → ending picture. A connected system where every number on one statement links to numbers on the others.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div style={{ padding: '16px', backgroundColor: '#eef2ff', borderLeft: `4px solid ${colors.primary}`, borderRadius: '4px', marginBottom: '24px' }}>
+                        <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark, lineHeight: '1.5' }}>
+                            The tutorials that follow will explore each statement in depth. But keep this architecture in mind as you work through them — every statement exists for a reason, and that reason is always about connecting the beginning picture to the ending picture.
+                        </p>
+                    </div>
+
+                    <ContinueButton onClick={() => setPhase('complete')} label="Finish Overview →" />
+                </Container>
+            );
+
+            // ── COMPLETE ──
+            const CompletePhase = () => (
+                <Container>
+                    <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                        <span style={{ fontSize: '64px' }}>🗺️</span>
+                        <h2 style={{ color: colors.primary, margin: '16px 0 8px 0' }}>You Have the Map</h2>
+                    </div>
+
+                    <div style={{ backgroundColor: colors.sand, padding: '24px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ margin: '0 0 16px 0', color: colors.primary }}>What You Discovered</h3>
+                        <ul style={{ margin: '0', paddingLeft: '20px', color: colors.earthDark, fontSize: '15px', lineHeight: '1.8' }}>
+                            <li>✓ The familiar identity — Assets = Liabilities + Equities — can be rearranged to work for any entity</li>
+                            <li>✓ The right side of the identity is an information device — it conveys information about the recorded assets and liabilities</li>
+                            <li>✓ For nonprofits, the right side becomes Net Assets, tracking donor restriction status</li>
+                            <li>✓ Two snapshots — beginning and ending Statements of Financial Position — are the bookends of the system</li>
+                            <li>✓ The Statement of Activities explains the change in net assets; the Statement of Cash Flows reconciles it to the change in cash</li>
+                            <li>✓ The Statement of Functional Expenses shows how expenses were allocated by function</li>
+                            <li>✓ Traditional presentation makes these connections hard to see — but they're always there</li>
+                        </ul>
+                    </div>
+
+                    <div style={{ backgroundColor: '#e8d9f0', borderLeft: '4px solid #9370db', padding: '20px', borderRadius: '4px', marginBottom: '24px' }}>
+                        <h3 style={{ margin: '0 0 8px 0', color: '#5b2d8e', fontSize: '15px' }}>The Deeper Point</h3>
+                        <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark, lineHeight: '1.5' }}>
+                            Financial statements are a human-created information system. Accountants designed them to organize and communicate specific kinds of information — recorded amounts, under specific rules and conventions. The architecture is logical once you see it, but what the statements capture is necessarily limited. They show recorded assets, not all valuable things. They show recorded obligations, not all commitments. Keeping that gap in mind is just as important as understanding the structure.
+                        </p>
+                    </div>
+
+                    <div style={{ backgroundColor: 'white', border: `2px solid ${colors.accent}`, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ margin: '0 0 8px 0', color: colors.primary, fontSize: '15px' }}>Coming Next</h3>
+                        <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark, lineHeight: '1.5' }}>
+                            <strong>Tutorial 1: The Statement of Financial Position</strong> — You'll work with real data from Oregon Humane Society and explore what the accounting identity reveals (and conceals) about an organization's financial position.
+                        </p>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <a
+                            href="NFP-Tutorial-1-Financial-Position.html"
+                            style={{
+                                display: 'inline-block',
+                                padding: '12px 32px',
+                                backgroundColor: colors.accent,
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '6px',
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                                textDecoration: 'none',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Start Tutorial 1 →
+                        </a>
+                        <button
+                            onClick={() => setPhase('welcome')}
+                            style={{
+                                padding: '12px 24px',
+                                backgroundColor: 'transparent',
+                                color: colors.earthDark,
+                                border: `2px solid ${colors.earthLight}`,
+                                borderRadius: '6px',
+                                fontSize: '14px',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            ↺ Restart Overview
+                        </button>
+                    </div>
+                </Container>
+            );
+
+            return (
+                <div style={{ minHeight: '100vh', backgroundColor: '#faf9f6', position: 'relative' }}>
+                    <SoundToggle />
+                    <Header />
+                    <GlossaryModal />
+                    {phase === 'welcome' && <WelcomePhase />}
+                    {phase === 'phase1' && <Phase1 />}
+                    {phase === 'phase2' && <Phase2 />}
+                    {phase === 'phase3' && <Phase3 />}
+                    {phase === 'phase4' && <Phase4 />}
+                    {phase === 'phase5' && <Phase5 />}
+                    {phase === 'complete' && <CompletePhase />}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<NFPTutorial0 />, document.getElementById('root'));
+    </script>
+</head>
+<body style="margin: 0; padding: 0;">
+    <div id="root"></div>
+</body>
+</html>

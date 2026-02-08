@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial 5: Liquidity & Expenses - Yale NFP Financial Literacy</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #f5f1e8;
+            color: #333;
+        }
+
+        button {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        input, textarea {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        table {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backgroundColor: rgba(0, 0, 0, 0.5);
+            display: flex;
+            alignItems: center;
+            justifyContent: center;
+            zIndex: 1000;
+        }
+
+        .modal-content {
+            backgroundColor: white;
+            borderRadius: 8px;
+            maxWidth: 600px;
+            maxHeight: 80vh;
+            overflow-y: auto;
+            zIndex: 1001;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const NFPTutorial5 = () => {
+            const [phase, setPhase] = useState('welcome');
+            const [soundOn, setSoundOn] = useState(true);
+            const [hints, setHints] = useState({});
+            const [devMode, setDevMode] = useState(false);
+            const [headerClickCount, setHeaderClickCount] = useState(0);
+            const [answers, setAnswers] = useState({});
+            const [glossaryOpen, setGlossaryOpen] = useState(false);
+
+            const colors = {
+                primary: '#00356b',
+                sand: '#f5f1e8',
+                earth: '#8b7355',
+                earthLight: '#d4c4a8',
+                earthDark: '#5c4d3d',
+                accent: '#c9a227',
+                clay: '#c4a574',
+                clayLight: '#e8dcc8',
+                clayDark: '#a08050',
+                success: '#22c55e',
+                successBg: '#f0fdf4',
+                warning: '#f59e0b',
+                warningBg: '#fffbeb',
+                error: '#dc2626',
+                errorBg: '#fef2f2',
+            };
+
+            // Four separate sound functions
+            const playSuccessTone = () => {
+                if (!soundOn) return;
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                oscillator.frequency.value = 800;
+                gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            };
+
+            const playSoftNope = () => {
+                if (!soundOn) return;
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                oscillator.frequency.value = 300;
+                gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            };
+
+            const playBuzzer = () => {
+                if (!soundOn) return;
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                oscillator.frequency.value = 200;
+                gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.5);
+            };
+
+            const playContinueClick = () => {
+                if (!soundOn) return;
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+                oscillator.connect(gain);
+                gain.connect(audioContext.destination);
+                oscillator.frequency.value = 600;
+                gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.15);
+            };
+
+            // Question handlers
+            const handleQ1 = (choice) => {
+                if (choice === 'B') {
+                    playSuccessTone();
+                } else if (!hints['q1_1']) {
+                    setHints(prev => ({ ...prev, q1_1: true }));
+                    playSoftNope();
+                } else if (!hints['q1_2']) {
+                    setHints(prev => ({ ...prev, q1_2: true }));
+                    playBuzzer();
+                } else {
+                    playSoftNope();
+                }
+                setAnswers({ ...answers, q1: choice });
+            };
+
+            const handleQ2 = (value) => {
+                const numValue = parseInt(value);
+                const isCorrect = numValue >= 19 && numValue <= 20;
+                if (value && !isCorrect) {
+                    if (!hints['q2_1']) {
+                        setHints(prev => ({ ...prev, q2_1: true }));
+                        playSoftNope();
+                    } else if (!hints['q2_2']) {
+                        setHints(prev => ({ ...prev, q2_2: true }));
+                        playBuzzer();
+                    } else {
+                        playSoftNope();
+                    }
+                } else if (value && isCorrect) {
+                    playSuccessTone();
+                }
+                setAnswers({ ...answers, q2: value });
+            };
+
+            const handleQ3 = (value) => {
+                setAnswers({ ...answers, q3: value });
+            };
+
+            const handleQ4 = (value) => {
+                const numValue = parseInt(value);
+                const isCorrect = numValue >= 79 && numValue <= 80;
+                if (value && !isCorrect) {
+                    if (!hints['q4_1']) {
+                        setHints(prev => ({ ...prev, q4_1: true }));
+                        playSoftNope();
+                    } else if (!hints['q4_2']) {
+                        setHints(prev => ({ ...prev, q4_2: true }));
+                        playBuzzer();
+                    } else {
+                        playSoftNope();
+                    }
+                } else if (value && isCorrect) {
+                    playSuccessTone();
+                }
+                setAnswers({ ...answers, q4: value });
+            };
+
+            const handleQ5 = (choice) => {
+                if (choice === 'B') {
+                    playSuccessTone();
+                } else if (!hints['q5_1']) {
+                    setHints(prev => ({ ...prev, q5_1: true }));
+                    playSoftNope();
+                } else if (!hints['q5_2']) {
+                    setHints(prev => ({ ...prev, q5_2: true }));
+                    playBuzzer();
+                } else {
+                    playSoftNope();
+                }
+                setAnswers({ ...answers, q5: choice });
+            };
+
+            const handleQ6 = (choice) => {
+                if (choice === 'B') {
+                    playSuccessTone();
+                } else if (!hints['q6_1']) {
+                    setHints(prev => ({ ...prev, q6_1: true }));
+                    playSoftNope();
+                } else if (!hints['q6_2']) {
+                    setHints(prev => ({ ...prev, q6_2: true }));
+                    playBuzzer();
+                } else {
+                    playSoftNope();
+                }
+                setAnswers({ ...answers, q6: choice });
+            };
+
+            const toggleHint = (questionId, hintNum) => {
+                const key = `${questionId}_${hintNum}`;
+                setHints({ ...hints, [key]: !hints[key] });
+                if (hintNum === 2) {
+                    playBuzzer();
+                } else {
+                    playSoftNope();
+                }
+            };
+
+            const handleRestartClick = () => {
+                playContinueClick();
+                setPhase('welcome');
+                setAnswers({});
+                setHints({});
+            };
+
+            const phaseSequence = ['welcome', 'phase1', 'phase2', 'phase3', 'phase4', 'phase5', 'phase6', 'complete'];
+
+            const ProgressBar = () => {
+                const phaseIndex = phaseSequence.indexOf(phase);
+                const progress = phaseIndex === -1 ? 0 : ((phaseIndex + 1) / phaseSequence.length) * 100;
+                return (
+                    <div style={{ width: '100%', backgroundColor: 'rgba(255,255,255,0.2)', height: '4px', position: 'relative' }}>
+                        <div style={{ width: `${progress}%`, backgroundColor: colors.accent, height: '100%', transition: 'width 0.3s' }} />
+                    </div>
+                );
+            };
+
+            const Header = () => {
+                const handleTitleClick = () => {
+                    const newCount = headerClickCount + 1;
+                    setHeaderClickCount(newCount);
+                    if (newCount === 3) {
+                        setDevMode(!devMode);
+                        setHeaderClickCount(0);
+                    }
+                };
+
+                return (
+                    <div style={{ backgroundColor: colors.primary, color: 'white', padding: '24px' }}>
+                        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', marginBottom: devMode ? '15px' : '0' }}>
+                                <h1
+                                    onClick={handleTitleClick}
+                                    style={{
+                                        margin: '0 0 8px 0',
+                                        fontSize: '28px',
+                                        fontWeight: 'bold',
+                                        cursor: 'pointer',
+                                        flex: 1,
+                                    }}
+                                    title="Triple-click to toggle dev mode"
+                                >
+                                    Tutorial 5: Liquidity & Expenses
+                                </h1>
+                                <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button
+                                        onClick={() => {
+                                            playContinueClick();
+                                            setGlossaryOpen(true);
+                                        }}
+                                        style={{
+                                            background: 'rgba(255,255,255,0.2)',
+                                            color: 'white',
+                                            border: 'none',
+                                            padding: '8px 12px',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontSize: '16px',
+                                            fontWeight: 'bold',
+                                        }}
+                                        title="Open Glossary"
+                                    >
+                                        📖
+                                    </button>
+                                    <button
+                                        onClick={handleRestartClick}
+                                        style={{
+                                            background: 'rgba(255,255,255,0.2)',
+                                            color: 'white',
+                                            border: 'none',
+                                            padding: '8px 12px',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontSize: '16px',
+                                            fontWeight: 'bold',
+                                        }}
+                                        title="Restart Tutorial"
+                                    >
+                                        ↺
+                                    </button>
+                                </div>
+                            </div>
+                            <p style={{ margin: '0', fontSize: '14px', opacity: 0.9 }}>Yale School of Management • NFP Financial Literacy</p>
+                            <p style={{ margin: '8px 0 0 0', fontSize: '12px', opacity: 0.8 }}>Rick2.0 • AI Tutor</p>
+                            <ProgressBar />
+                            {devMode && (
+                                <div style={{ marginTop: '10px', padding: '10px', backgroundColor: 'rgba(255,255,255,0.1)', borderRadius: '6px' }}>
+                                    <p style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: 'bold' }}>Dev Mode: Skip to phase</p>
+                                    <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+                                        {phaseSequence.map(p => (
+                                            <button
+                                                key={p}
+                                                onClick={() => { setPhase(p); setHints({}); setAnswers({}); }}
+                                                style={{
+                                                    padding: '6px 12px',
+                                                    fontSize: '11px',
+                                                    fontWeight: 'bold',
+                                                    border: 'none',
+                                                    borderRadius: '4px',
+                                                    cursor: 'pointer',
+                                                    backgroundColor: p === phase ? colors.accent : 'rgba(255,255,255,0.2)',
+                                                    color: p === phase ? colors.primary : 'white',
+                                                }}
+                                            >
+                                                {p}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            };
+
+            const GlossaryModal = () => {
+                if (!glossaryOpen) return null;
+                return (
+                    <div style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                    }}>
+                        <div style={{
+                            backgroundColor: 'white',
+                            borderRadius: '8px',
+                            padding: '32px',
+                            maxWidth: '600px',
+                            maxHeight: '80vh',
+                            overflowY: 'auto',
+                        }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                                <h2 style={{ margin: 0, color: colors.primary }}>📖 Glossary</h2>
+                                <button
+                                    onClick={() => {
+                                        playContinueClick();
+                                        setGlossaryOpen(false);
+                                    }}
+                                    style={{
+                                        background: 'none',
+                                        border: 'none',
+                                        fontSize: '24px',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <div style={{ fontSize: '13px', color: colors.earthDark }}>
+                                <p><strong>Liquidity:</strong> The ability to convert assets to cash to meet near-term obligations — an asset-side question.</p>
+                                <p><strong>ASC 958-210:</strong> The accounting standard requiring nonprofits to disclose how they manage liquidity and the availability of financial assets within one year.</p>
+                                <p><strong>Financial Assets:</strong> Assets that are or could become cash — investments, receivables, cash. Excludes property, equipment, collections.</p>
+                                <p><strong>Program Services:</strong> Activities that fulfill the nonprofit's mission — the reason the organization exists.</p>
+                                <p><strong>Supporting Services:</strong> Management & general plus fundraising — the infrastructure that enables programs.</p>
+                                <p><strong>Functional Expense Ratio:</strong> Program expenses divided by total expenses — a transparency tool, not an effectiveness indicator.</p>
+                                <p><strong>Net Investment in Capital Assets:</strong> Unrestricted net assets tied up in buildings, equipment, and other long-term assets.</p>
+                                <p><strong>Board-Designated Funds:</strong> Unrestricted net assets that the board has set aside for a specific purpose, but could theoretically reclaim.</p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const SoundToggle = () => (
+                <button
+                    onClick={() => setSoundOn(!soundOn)}
+                    style={{
+                        position: 'absolute',
+                        top: '16px',
+                        right: '16px',
+                        background: colors.sand,
+                        border: 'none',
+                        padding: '8px',
+                        borderRadius: '50%',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '20px',
+                        zIndex: 100,
+                    }}
+                    title={soundOn ? "Sound On" : "Sound Off"}
+                >
+                    {soundOn ? '🔊' : '🔇'}
+                </button>
+            );
+
+            // Welcome Phase
+            const WelcomePhase = () => {
+                const [aiTransparencyOpen, setAiTransparencyOpen] = useState(false);
+
+                return (
+                    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
+                        <div style={{ backgroundColor: colors.sand, padding: '32px', borderRadius: '8px', marginBottom: '24px' }}>
+                            <h2 style={{ color: colors.primary, marginTop: 0 }}>Welcome to Tutorial 5</h2>
+                            <p style={{ fontSize: '16px', lineHeight: '1.6', color: colors.earthDark }}>
+                                This tutorial answers two critical questions about nonprofit finances:
+                            </p>
+                            <div style={{ marginTop: '16px' }}>
+                                <p style={{ marginBottom: '12px' }}>
+                                    <strong>1. Can the organization pay its bills?</strong><br />
+                                    This is answered by the <strong>Liquidity Footnote</strong> (ASC 958-210) — not by net asset categories.
+                                </p>
+                                <p style={{ marginBottom: '12px' }}>
+                                    <strong>2. How does the organization allocate spending between mission and overhead?</strong><br />
+                                    This is answered by the <strong>Statement of Functional Expenses</strong> — unique to nonprofits.
+                                </p>
+                            </div>
+                            <p style={{ fontSize: '14px', color: colors.earth, marginTop: '20px', fontStyle: 'italic' }}>
+                                Key insight: A nonprofit can have millions in net assets but only thousands available for operations. The liquidity footnote reveals the truth.
+                            </p>
+                        </div>
+
+                        <div style={{
+                            backgroundColor: colors.warningBg,
+                            border: `1px solid ${colors.warning}`,
+                            borderRadius: '8px',
+                            marginBottom: '24px',
+                            padding: '16px',
+                        }}>
+                            <button
+                                onClick={() => setAiTransparencyOpen(!aiTransparencyOpen)}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    width: '100%',
+                                    textAlign: 'left',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    padding: '8px 0',
+                                }}
+                            >
+                                <span style={{ fontWeight: 'bold', color: colors.earthDark }}>
+                                    AI Transparency Note {aiTransparencyOpen ? '−' : '+'}
+                                </span>
+                            </button>
+                            {aiTransparencyOpen && (
+                                <div style={{ marginTop: '12px', fontSize: '13px', color: colors.earthDark }}>
+                                    <p>
+                                        This tutorial was created with AI assistance. The content has been carefully reviewed for accuracy, but you should always verify important financial concepts with the nonprofit's actual financial statements and official accounting standards.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('phase1');
+                            }}
+                            style={{
+                                backgroundColor: colors.primary,
+                                color: 'white',
+                                border: 'none',
+                                padding: '14px 28px',
+                                borderRadius: '4px',
+                                fontSize: '16px',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Begin: Liquidity Footnote
+                        </button>
+                    </div>
+                );
+            };
+
+            // Phase 1: Understanding Liquidity
+            const Phase1 = () => (
+                <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
+                    <h2 style={{ color: colors.primary }}>Phase 1: The Liquidity Question</h2>
+                    <div style={{ backgroundColor: colors.sand, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <p style={{ fontSize: '14px', color: colors.earthDark }}>
+                            <strong>The Question:</strong> Can the organization pay its bills? This is fundamentally an <strong>asset-side question</strong> — it's about what liquid resources are available <em>right now</em>.
+                        </p>
+                        <p style={{ fontSize: '14px', color: colors.earthDark, marginTop: '12px' }}>
+                            Net asset categories (With/Without Donor Restrictions) tell you whether money is restricted by donors or the board — but they don't tell you if it's liquid.
+                        </p>
+                    </div>
+
+                    <div style={{ backgroundColor: colors.clayLight, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>Question 1: Liquidity vs. Net Assets</h3>
+                        <p style={{ fontSize: '14px', color: colors.earthDark }}>
+                            A board member says: "Our Net Assets Without Donor Restrictions are $87 million — the organization has plenty of financial cushion." Is the liquidity footnote likely to confirm or complicate this view?
+                        </p>
+                        <div style={{ marginTop: '16px' }}>
+                            <button
+                                onClick={() => handleQ1('A')}
+                                style={{
+                                    display: 'block',
+                                    width: '100%',
+                                    padding: '12px',
+                                    margin: '8px 0',
+                                    backgroundColor: answers.q1 === 'A' ? colors.warning : 'white',
+                                    border: `2px solid ${colors.earth}`,
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    fontSize: '14px',
+                                }}
+                            >
+                                <strong>A)</strong> Confirm — $87 million is a strong position
+                            </button>
+                            <button
+                                onClick={() => handleQ1('B')}
+                                style={{
+                                    display: 'block',
+                                    width: '100%',
+                                    padding: '12px',
+                                    margin: '8px 0',
+                                    backgroundColor: answers.q1 === 'B' ? colors.success : 'white',
+                                    border: `2px solid ${colors.earth}`,
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    fontSize: '14px',
+                                }}
+                            >
+                                <strong>B)</strong> Complicate — net asset categories don't tell you about liquidity
+                            </button>
+                        </div>
+
+                        {answers.q1 && (
+                            <div style={{
+                                marginTop: '16px',
+                                backgroundColor: answers.q1 === 'B' ? colors.successBg : colors.errorBg,
+                                padding: '12px',
+                                borderRadius: '4px',
+                                borderLeft: `4px solid ${answers.q1 === 'B' ? colors.success : colors.error}`,
+                            }}>
+                                <p style={{ margin: 0, fontSize: '13px', color: colors.earthDark }}>
+                                    {answers.q1 === 'B' ? '✓ Correct!' : '✗ Not quite.'} The liquidity footnote dramatically changes the picture. Of the $87 million in unrestricted net assets, $62.6 million is in buildings and land. The footnote shows that only $19.3 million in financial assets is available for general expenditure within one year.
+                                </p>
+                            </div>
+                        )}
+
+                        <button
+                            onClick={() => toggleHint('q1', 1)}
+                            style={{
+                                marginTop: '12px',
+                                backgroundColor: 'transparent',
+                                color: colors.accent,
+                                border: `1px solid ${colors.accent}`,
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {hints.q1_1 ? '− Hide Hint 1' : '+ Show Hint 1'}
+                        </button>
+                        {hints.q1_1 && (
+                            <div style={{ marginTop: '8px', padding: '12px', backgroundColor: colors.sand, borderRadius: '4px', fontSize: '13px' }}>
+                                Remember what you learned about net investment in capital assets. How much of that $87 million is in buildings?
+                            </div>
+                        )}
+
+                        <button
+                            onClick={() => toggleHint('q1', 2)}
+                            style={{
+                                marginTop: '8px',
+                                marginLeft: '8px',
+                                backgroundColor: 'transparent',
+                                color: colors.accent,
+                                border: `1px solid ${colors.accent}`,
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {hints.q1_2 ? '− Hide Hint 2' : '+ Show Hint 2'}
+                        </button>
+                        {hints.q1_2 && (
+                            <div style={{ marginTop: '8px', padding: '12px', backgroundColor: colors.sand, borderRadius: '4px', fontSize: '13px' }}>
+                                $62.6 million is in buildings and land. Those are unrestricted but illiquid. The liquidity footnote shows what's actually available.
+                            </div>
+                        )}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('phase2');
+                            }}
+                            style={{
+                                backgroundColor: colors.primary,
+                                color: 'white',
+                                border: 'none',
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            Next
+                        </button>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('welcome');
+                            }}
+                            style={{
+                                backgroundColor: colors.sand,
+                                color: colors.primary,
+                                border: `1px solid ${colors.primary}`,
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Back
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Phase 2: Calculating Available Liquidity
+            const Phase2 = () => (
+                <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
+                    <h2 style={{ color: colors.primary }}>Phase 2: Calculating Available Liquidity</h2>
+                    <div style={{ backgroundColor: colors.sand, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>The Liquidity Footnote (Note 4) — OHS FY2024</h3>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                            <tbody>
+                                <tr style={{ borderBottom: `1px solid ${colors.earth}` }}>
+                                    <td style={{ padding: '8px', textAlign: 'left' }}>Financial assets at year-end</td>
+                                    <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold' }}>$45,300,000</td>
+                                </tr>
+                                <tr style={{ borderBottom: `1px solid ${colors.earth}`, backgroundColor: colors.earthLight }}>
+                                    <td style={{ padding: '8px' }}>Less: Donor-restricted for specific purposes</td>
+                                    <td style={{ padding: '8px', textAlign: 'right' }}>$(19,100,000)</td>
+                                </tr>
+                                <tr style={{ borderBottom: `1px solid ${colors.earth}`, backgroundColor: colors.earthLight }}>
+                                    <td style={{ padding: '8px' }}>Less: Board-designated endowment</td>
+                                    <td style={{ padding: '8px', textAlign: 'right' }}>$(7,900,000)</td>
+                                </tr>
+                                <tr style={{ borderBottom: `1px solid ${colors.earth}` }}>
+                                    <td style={{ padding: '8px' }}>Plus: Endowment spending-rate appropriated</td>
+                                    <td style={{ padding: '8px', textAlign: 'right' }}>$1,000,000</td>
+                                </tr>
+                                <tr style={{ backgroundColor: colors.accent, color: 'white' }}>
+                                    <td style={{ padding: '12px', fontWeight: 'bold' }}>Available for general expenditure within one year</td>
+                                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold' }}>$19,300,000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style={{ backgroundColor: colors.clayLight, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>Question 2: Calculate Available Liquidity</h3>
+                        <p style={{ fontSize: '14px', color: colors.earthDark }}>
+                            OHS has approximately $45.3 million in financial assets. After subtracting amounts not available and adding back appropriated endowment spending, how much is available for general expenditure within one year? <strong>Enter in millions, rounded.</strong>
+                        </p>
+                        <input
+                            type="number"
+                            value={answers.q2 || ''}
+                            onChange={(e) => handleQ2(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleQ2(e.target.value); }}
+                            placeholder="Enter number (e.g., 19)"
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                marginTop: '12px',
+                                fontSize: '14px',
+                                border: `2px solid ${colors.earth}`,
+                                borderRadius: '4px',
+                            }}
+                        />
+
+                        {answers.q2 && (
+                            <div style={{
+                                marginTop: '16px',
+                                backgroundColor: (parseInt(answers.q2) >= 19 && parseInt(answers.q2) <= 20) ? colors.successBg : colors.errorBg,
+                                padding: '12px',
+                                borderRadius: '4px',
+                                borderLeft: `4px solid ${(parseInt(answers.q2) >= 19 && parseInt(answers.q2) <= 20) ? colors.success : colors.error}`,
+                            }}>
+                                <p style={{ margin: 0, fontSize: '13px', color: colors.earthDark }}>
+                                    {(parseInt(answers.q2) >= 19 && parseInt(answers.q2) <= 20) ? '✓ Correct!' : '✗ Not quite.'} About $19.3 million is available for general expenditure within one year. The footnote starts with all financial assets ($45.3M), subtracts donor-restricted amounts and board-designated endowment ($27M unavailable), and adds back the amount the board has appropriated for spending from the endowment ($1.0M).
+                                </p>
+                            </div>
+                        )}
+
+                        <button
+                            onClick={() => toggleHint('q2', 1)}
+                            style={{
+                                marginTop: '12px',
+                                backgroundColor: 'transparent',
+                                color: colors.accent,
+                                border: `1px solid ${colors.accent}`,
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {hints.q2_1 ? '− Hide Hint 1' : '+ Show Hint 1'}
+                        </button>
+                        {hints.q2_1 && (
+                            <div style={{ marginTop: '8px', padding: '12px', backgroundColor: colors.sand, borderRadius: '4px', fontSize: '13px' }}>
+                                $45.3M minus $27.0M not available plus $1.0M appropriated = ?
+                            </div>
+                        )}
+
+                        <button
+                            onClick={() => toggleHint('q2', 2)}
+                            style={{
+                                marginTop: '8px',
+                                marginLeft: '8px',
+                                backgroundColor: 'transparent',
+                                color: colors.accent,
+                                border: `1px solid ${colors.accent}`,
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {hints.q2_2 ? '− Hide Hint 2' : '+ Show Hint 2'}
+                        </button>
+                        {hints.q2_2 && (
+                            <div style={{ marginTop: '8px', padding: '12px', backgroundColor: colors.sand, borderRadius: '4px', fontSize: '13px' }}>
+                                $45.3M − $27.0M + $1.0M = $19.3M
+                            </div>
+                        )}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('phase3');
+                            }}
+                            style={{
+                                backgroundColor: colors.primary,
+                                color: 'white',
+                                border: 'none',
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            Next
+                        </button>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('phase1');
+                            }}
+                            style={{
+                                backgroundColor: colors.sand,
+                                color: colors.primary,
+                                border: `1px solid ${colors.primary}`,
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Back
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Phase 3: Board-Designated Funds
+            const Phase3 = () => (
+                <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
+                    <h2 style={{ color: colors.primary }}>Phase 3: Understanding Board-Designated Funds</h2>
+                    <div style={{ backgroundColor: colors.sand, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>The Nuance</h3>
+                        <p style={{ fontSize: '14px', color: colors.earthDark }}>
+                            Board-designated endowment ($7.9M) is subtracted from available assets — even though the board <em>could</em> technically reverse the designation in an emergency. Why?
+                        </p>
+                        <p style={{ fontSize: '14px', color: colors.earthDark, marginTop: '12px' }}>
+                            The liquidity footnote reflects <strong>current intent</strong>, not theoretical capability. The board designated the endowment to preserve it for long-term investment returns. Subtracting it provides a realistic picture of what's actually available for operations <em>under current plans</em>.
+                        </p>
+                    </div>
+
+                    <div style={{ backgroundColor: colors.clayLight, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>Question 3: Why Subtract Board-Designated Funds?</h3>
+                        <p style={{ fontSize: '14px', color: colors.earthDark }}>
+                            Why does the liquidity footnote subtract board-designated endowment funds from available assets, even though the board COULD reverse the designation?
+                        </p>
+                        <textarea
+                            value={answers.q3 || ''}
+                            onChange={(e) => handleQ3(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleQ3(e.target.value); } }}
+                            placeholder="Type your answer..."
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                marginTop: '12px',
+                                fontSize: '13px',
+                                border: `2px solid ${colors.earth}`,
+                                borderRadius: '4px',
+                                minHeight: '100px',
+                                fontFamily: 'inherit',
+                                resize: 'vertical',
+                            }}
+                        />
+
+                        {answers.q3 && (
+                            <div style={{
+                                marginTop: '16px',
+                                backgroundColor: colors.successBg,
+                                padding: '12px',
+                                borderRadius: '4px',
+                                borderLeft: `4px solid ${colors.success}`,
+                            }}>
+                                <p style={{ margin: 0, fontSize: '13px', color: colors.earthDark }}>
+                                    <strong>✓ Good thinking!</strong> Even though the board could reverse the designation, the footnote reflects management's current intent. The endowment was designated because the board intends to preserve it for investment returns. Subtracting it gives a realistic picture of what's actually available for operations under current plans. But note: in a genuine emergency, the board COULD access these funds — that's why they're still classified as Without Donor Restrictions.
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('phase4');
+                            }}
+                            style={{
+                                backgroundColor: colors.primary,
+                                color: 'white',
+                                border: 'none',
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            Next: Functional Expenses
+                        </button>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('phase2');
+                            }}
+                            style={{
+                                backgroundColor: colors.sand,
+                                color: colors.primary,
+                                border: `1px solid ${colors.primary}`,
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Back
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Phase 4: Functional Expenses Intro
+            const Phase4 = () => (
+                <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
+                    <h2 style={{ color: colors.primary }}>Phase 4: Statement of Functional Expenses</h2>
+                    <div style={{ backgroundColor: colors.sand, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>What Is It?</h3>
+                        <p style={{ fontSize: '14px', color: colors.earthDark }}>
+                            The Statement of Functional Expenses is unique to nonprofits. It shows how total expenses are divided between:
+                        </p>
+                        <ul style={{ fontSize: '14px', color: colors.earthDark', marginTop: '12px' }}>
+                            <li><strong>Program Services</strong> — activities that fulfill the mission</li>
+                            <li><strong>Supporting Services</strong> — management & general, and fundraising</li>
+                        </ul>
+                        <p style={{ fontSize: '14px', color: colors.earthDark, marginTop: '12px' }}>
+                            For-profit companies don't have this because they have owners and shareholders who can see efficiency through market prices. Nonprofits have no owners — accountability runs to donors, the public, and the mission. This statement demonstrates how money is spent.
+                        </p>
+                    </div>
+
+                    <div style={{ backgroundColor: colors.clayLight, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>OHS FY2024 Functional Expenses</h3>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                            <tbody>
+                                <tr style={{ borderBottom: `1px solid ${colors.earth}` }}>
+                                    <td style={{ padding: '8px', textAlign: 'left' }}>Program services</td>
+                                    <td style={{ padding: '8px', textAlign: 'right' }}>$29,559,814</td>
+                                    <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold' }}>79.9%</td>
+                                </tr>
+                                <tr style={{ borderBottom: `1px solid ${colors.earth}` }}>
+                                    <td style={{ padding: '8px', textAlign: 'left' }}>Management & general</td>
+                                    <td style={{ padding: '8px', textAlign: 'right' }}>~$4,500,000</td>
+                                    <td style={{ padding: '8px', textAlign: 'right' }}></td>
+                                </tr>
+                                <tr style={{ borderBottom: `1px solid ${colors.earth}` }}>
+                                    <td style={{ padding: '8px', textAlign: 'left' }}>Fundraising</td>
+                                    <td style={{ padding: '8px', textAlign: 'right' }}>~$2,957,000</td>
+                                    <td style={{ padding: '8px', textAlign: 'right' }}></td>
+                                </tr>
+                                <tr style={{ borderBottom: `1px solid ${colors.earth}` }}>
+                                    <td style={{ padding: '8px', textAlign: 'left' }}>Total supporting services</td>
+                                    <td style={{ padding: '8px', textAlign: 'right' }}>$7,456,593</td>
+                                    <td style={{ padding: '8px', textAlign: 'right', fontWeight: 'bold' }}>20.1%</td>
+                                </tr>
+                                <tr style={{ backgroundColor: colors.accent, color: 'white' }}>
+                                    <td style={{ padding: '12px', fontWeight: 'bold' }}>Total expenses</td>
+                                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold' }}>$37,016,407</td>
+                                    <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold' }}>100%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('phase5');
+                            }}
+                            style={{
+                                backgroundColor: colors.primary,
+                                color: 'white',
+                                border: 'none',
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            Next
+                        </button>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('phase3');
+                            }}
+                            style={{
+                                backgroundColor: colors.sand,
+                                color: colors.primary,
+                                border: `1px solid ${colors.primary}`,
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Back
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Phase 5: Program Expense Ratio
+            const Phase5 = () => (
+                <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
+                    <h2 style={{ color: colors.primary }}>Phase 5: The Program Expense Ratio</h2>
+
+                    <div style={{ backgroundColor: colors.clayLight, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>Question 4: Calculate OHS's Program Ratio</h3>
+                        <p style={{ fontSize: '14px', color: colors.earthDark }}>
+                            OHS spent $29,559,814 on program services and $37,016,407 in total. What percentage of total expenses went to programs? <strong>Round to the nearest whole number.</strong>
+                        </p>
+                        <input
+                            type="number"
+                            value={answers.q4 || ''}
+                            onChange={(e) => handleQ4(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === 'Enter') handleQ4(e.target.value); }}
+                            placeholder="Enter percentage (e.g., 80)"
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                marginTop: '12px',
+                                fontSize: '14px',
+                                border: `2px solid ${colors.earth}`,
+                                borderRadius: '4px',
+                            }}
+                        />
+
+                        {answers.q4 && (
+                            <div style={{
+                                marginTop: '16px',
+                                backgroundColor: (parseInt(answers.q4) >= 79 && parseInt(answers.q4) <= 80) ? colors.successBg : colors.errorBg,
+                                padding: '12px',
+                                borderRadius: '4px',
+                                borderLeft: `4px solid ${(parseInt(answers.q4) >= 79 && parseInt(answers.q4) <= 80) ? colors.success : colors.error}`,
+                            }}>
+                                <p style={{ margin: 0, fontSize: '13px', color: colors.earthDark }}>
+                                    {(parseInt(answers.q4) >= 79 && parseInt(answers.q4) <= 80) ? '✓ Correct!' : '✗ Not quite.'} About 80% of OHS's total expenses go to program services. The remaining 20% goes to supporting services — management & general, and fundraising. Donors and watchdog organizations pay close attention to this ratio as one indicator of how efficiently a nonprofit uses its resources.
+                                </p>
+                            </div>
+                        )}
+
+                        <button
+                            onClick={() => toggleHint('q4', 1)}
+                            style={{
+                                marginTop: '12px',
+                                backgroundColor: 'transparent',
+                                color: colors.accent,
+                                border: `1px solid ${colors.accent}`,
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {hints.q4_1 ? '− Hide Hint 1' : '+ Show Hint 1'}
+                        </button>
+                        {hints.q4_1 && (
+                            <div style={{ marginTop: '8px', padding: '12px', backgroundColor: colors.sand, borderRadius: '4px', fontSize: '13px' }}>
+                                Divide program expenses by total expenses and multiply by 100.
+                            </div>
+                        )}
+
+                        <button
+                            onClick={() => toggleHint('q4', 2)}
+                            style={{
+                                marginTop: '8px',
+                                marginLeft: '8px',
+                                backgroundColor: 'transparent',
+                                color: colors.accent,
+                                border: `1px solid ${colors.accent}`,
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {hints.q4_2 ? '− Hide Hint 2' : '+ Show Hint 2'}
+                        </button>
+                        {hints.q4_2 && (
+                            <div style={{ marginTop: '8px', padding: '12px', backgroundColor: colors.sand, borderRadius: '4px', fontSize: '13px' }}>
+                                $29,559,814 ÷ $37,016,407 × 100 = ?
+                            </div>
+                        )}
+                    </div>
+
+                    <div style={{ backgroundColor: colors.sand, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>Question 5: Why Nonprofits Show This</h3>
+                        <p style={{ fontSize: '14px', color: colors.earthDark }}>
+                            The Statement of Functional Expenses is unique to nonprofits — for-profits don't have one. Why do nonprofits need to show this breakdown?
+                        </p>
+                        <div style={{ marginTop: '16px' }}>
+                            <button
+                                onClick={() => handleQ5('A')}
+                                style={{
+                                    display: 'block',
+                                    width: '100%',
+                                    padding: '12px',
+                                    margin: '8px 0',
+                                    backgroundColor: answers.q5 === 'A' ? colors.warning : 'white',
+                                    border: `2px solid ${colors.earth}`,
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    fontSize: '14px',
+                                }}
+                            >
+                                <strong>A)</strong> Because nonprofits must prove they're spending efficiently to keep tax-exempt status
+                            </button>
+                            <button
+                                onClick={() => handleQ5('B')}
+                                style={{
+                                    display: 'block',
+                                    width: '100%',
+                                    padding: '12px',
+                                    margin: '8px 0',
+                                    backgroundColor: answers.q5 === 'B' ? colors.success : 'white',
+                                    border: `2px solid ${colors.earth}`,
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    fontSize: '14px',
+                                }}
+                            >
+                                <strong>B)</strong> Because donors and the public want to see how much goes to mission vs. overhead
+                            </button>
+                        </div>
+
+                        {answers.q5 && (
+                            <div style={{
+                                marginTop: '16px',
+                                backgroundColor: answers.q5 === 'B' ? colors.successBg : colors.errorBg,
+                                padding: '12px',
+                                borderRadius: '4px',
+                                borderLeft: `4px solid ${answers.q5 === 'B' ? colors.success : colors.error}`,
+                            }}>
+                                <p style={{ margin: 0, fontSize: '13px', color: colors.earthDark }}>
+                                    {answers.q5 === 'B' ? '✓ Correct!' : '✗ Not quite.'} Without owners or shareholders, nonprofits demonstrate accountability through transparency. The functional expense breakdown shows how much goes to programs (the mission) versus overhead (management, fundraising). While the ratio is imperfect as an indicator of effectiveness — some overhead is essential for good programs — it's a key transparency tool.
+                                </p>
+                            </div>
+                        )}
+
+                        <button
+                            onClick={() => toggleHint('q5', 1)}
+                            style={{
+                                marginTop: '12px',
+                                backgroundColor: 'transparent',
+                                color: colors.accent,
+                                border: `1px solid ${colors.accent}`,
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {hints.q5_1 ? '− Hide Hint 1' : '+ Show Hint 1'}
+                        </button>
+                        {hints.q5_1 && (
+                            <div style={{ marginTop: '8px', padding: '12px', backgroundColor: colors.sand, borderRadius: '4px', fontSize: '13px' }}>
+                                Think about accountability. Who are nonprofits accountable to?
+                            </div>
+                        )}
+
+                        <button
+                            onClick={() => toggleHint('q5', 2)}
+                            style={{
+                                marginTop: '8px',
+                                marginLeft: '8px',
+                                backgroundColor: 'transparent',
+                                color: colors.accent,
+                                border: `1px solid ${colors.accent}`,
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {hints.q5_2 ? '− Hide Hint 2' : '+ Show Hint 2'}
+                        </button>
+                        {hints.q5_2 && (
+                            <div style={{ marginTop: '8px', padding: '12px', backgroundColor: colors.sand, borderRadius: '4px', fontSize: '13px' }}>
+                                Nonprofits have no owners or shareholders. Accountability runs to donors, the public, and the mission. They want to know: is the money going to programs?
+                            </div>
+                        )}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('phase6');
+                            }}
+                            style={{
+                                backgroundColor: colors.primary,
+                                color: 'white',
+                                border: 'none',
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            Next
+                        </button>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('phase4');
+                            }}
+                            style={{
+                                backgroundColor: colors.sand,
+                                color: colors.primary,
+                                border: `1px solid ${colors.primary}`,
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Back
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Phase 6: Beyond the Ratio
+            const Phase6 = () => (
+                <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
+                    <h2 style={{ color: colors.primary }}>Phase 6: Beyond the Ratio</h2>
+                    <div style={{ backgroundColor: colors.sand, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>A Critical Insight</h3>
+                        <p style={{ fontSize: '14px', color: colors.earthDark }}>
+                            The program expense ratio is a transparency tool — it shows <em>how</em> money is allocated. But it does NOT tell you whether those programs are effective or achieving the mission.
+                        </p>
+                        <p style={{ fontSize: '14px', color: colors.earthDark, marginTop: '12px' }}>
+                            An organization spending 95% on programs but underfunding management, financial controls, and development might actually deliver weaker programs than an organization spending 75% on programs with strong infrastructure.
+                        </p>
+                    </div>
+
+                    <div style={{ backgroundColor: colors.clayLight, padding: '20px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>Question 6: Is a Higher Program Ratio Always Better?</h3>
+                        <p style={{ fontSize: '14px', color: colors.earthDark }}>
+                            An organization spends 95% on programs and 5% on management. Another spends 75% on programs and 25% on management. Which is necessarily more effective?
+                        </p>
+                        <div style={{ marginTop: '16px' }}>
+                            <button
+                                onClick={() => handleQ6('A')}
+                                style={{
+                                    display: 'block',
+                                    width: '100%',
+                                    padding: '12px',
+                                    margin: '8px 0',
+                                    backgroundColor: answers.q6 === 'A' ? colors.warning : 'white',
+                                    border: `2px solid ${colors.earth}`,
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    fontSize: '14px',
+                                }}
+                            >
+                                <strong>A)</strong> The 95% organization — more money goes to mission
+                            </button>
+                            <button
+                                onClick={() => handleQ6('B')}
+                                style={{
+                                    display: 'block',
+                                    width: '100%',
+                                    padding: '12px',
+                                    margin: '8px 0',
+                                    backgroundColor: answers.q6 === 'B' ? colors.success : 'white',
+                                    border: `2px solid ${colors.earth}`,
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    textAlign: 'left',
+                                    fontSize: '14px',
+                                }}
+                            >
+                                <strong>B)</strong> You can't tell from these ratios alone
+                            </button>
+                        </div>
+
+                        {answers.q6 && (
+                            <div style={{
+                                marginTop: '16px',
+                                backgroundColor: answers.q6 === 'B' ? colors.successBg : colors.errorBg,
+                                padding: '12px',
+                                borderRadius: '4px',
+                                borderLeft: `4px solid ${answers.q6 === 'B' ? colors.success : colors.error}`,
+                            }}>
+                                <p style={{ margin: 0, fontSize: '13px', color: colors.earthDark }}>
+                                    {answers.q6 === 'B' ? '✓ Correct!' : '✗ Not quite.'} The program expense ratio is a transparency tool, not an effectiveness score. An organization that under-invests in management, financial controls, and fundraising may actually deliver weaker programs. The ratio tells you how expenses are allocated, but not whether those programs are achieving their mission. Understanding what the ratio represents is different from analyzing whether it's "good" — that analysis requires deeper investigation beyond these financial statements.
+                                </p>
+                            </div>
+                        )}
+
+                        <button
+                            onClick={() => toggleHint('q6', 1)}
+                            style={{
+                                marginTop: '12px',
+                                backgroundColor: 'transparent',
+                                color: colors.accent,
+                                border: `1px solid ${colors.accent}`,
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {hints.q6_1 ? '− Hide Hint 1' : '+ Show Hint 1'}
+                        </button>
+                        {hints.q6_1 && (
+                            <div style={{ marginTop: '8px', padding: '12px', backgroundColor: colors.sand, borderRadius: '4px', fontSize: '13px' }}>
+                                Does spending less on management always mean better programs? What does "management" include?
+                            </div>
+                        )}
+
+                        <button
+                            onClick={() => toggleHint('q6', 2)}
+                            style={{
+                                marginTop: '8px',
+                                marginLeft: '8px',
+                                backgroundColor: 'transparent',
+                                color: colors.accent,
+                                border: `1px solid ${colors.accent}`,
+                                padding: '6px 12px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            {hints.q6_2 ? '− Hide Hint 2' : '+ Show Hint 2'}
+                        </button>
+                        {hints.q6_2 && (
+                            <div style={{ marginTop: '8px', padding: '12px', backgroundColor: colors.sand, borderRadius: '4px', fontSize: '13px' }}>
+                                Management includes financial controls, compliance, HR, strategic planning. Under-investing in management can actually hurt program quality.
+                            </div>
+                        )}
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('complete');
+                            }}
+                            style={{
+                                backgroundColor: colors.primary,
+                                color: 'white',
+                                border: 'none',
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            Complete Tutorial
+                        </button>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                setPhase('phase5');
+                            }}
+                            style={{
+                                backgroundColor: colors.sand,
+                                color: colors.primary,
+                                border: `1px solid ${colors.primary}`,
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                            }}
+                        >
+                            Back
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Complete Phase - in correct order: Header, Trophy, "What You Discovered", "The Deeper Point", "Coming Next", Next Tutorial button, Restart button
+            const CompletePhase = () => (
+                <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                        <div style={{ fontSize: '80px', marginBottom: '16px' }}>🏆</div>
+                        <h2 style={{ color: colors.primary, margin: '0 0 12px 0', fontSize: '32px' }}>Tutorial 5 Complete!</h2>
+                        <p style={{ fontSize: '16px', color: colors.earthDark }}>You've mastered liquidity and functional expenses.</p>
+                    </div>
+
+                    <div style={{ backgroundColor: colors.sand, padding: '24px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.primary }}>What You Discovered</h3>
+                        <ol style={{ fontSize: '14px', color: colors.earthDark, lineHeight: '1.8' }}>
+                            <li><strong>Liquidity is an asset-side question</strong> — the footnote answers it, not net asset categories.</li>
+                            <li><strong>OHS has $87M unrestricted net assets but only $19.3M available for general expenditure</strong> within a year.</li>
+                            <li><strong>Board-designated funds are subtracted</strong> from available assets to reflect current intent.</li>
+                            <li><strong>The functional expense breakdown</strong> shows how expenses divide between programs and supporting services.</li>
+                            <li><strong>The program expense ratio</strong> is a transparency tool, not an effectiveness score.</li>
+                            <li><strong>The misleading term "reserves"</strong> should give way to the specific liquidity footnote disclosure required by ASC 958-210.</li>
+                        </ol>
+                    </div>
+
+                    <div style={{ backgroundColor: colors.clayLight, padding: '24px', borderRadius: '8px', marginBottom: '24px' }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>The Deeper Point</h3>
+                        <p style={{ fontSize: '14px', color: colors.earthDark, lineHeight: '1.6' }}>
+                            Financial statements are designed for different audiences with different needs. Donors need to know if their gifts support the mission. Management needs to know if the organization can pay its bills. Auditors need to know if resources are deployed according to donor intent. The liquidity footnote and the functional expense statement serve these needs — each in their own way. Understanding which question each statement answers is the key to reading nonprofit finances intelligently.
+                        </p>
+                    </div>
+
+                    <div style={{ backgroundColor: colors.warningBg, padding: '20px', borderRadius: '8px', marginBottom: '24px', borderLeft: `4px solid ${colors.warning}` }}>
+                        <h3 style={{ marginTop: 0, color: colors.earthDark }}>Coming Next: Tutorial 6</h3>
+                        <p style={{ margin: '0', fontSize: '14px', color: colors.earthDark }}>
+                            <strong>Putting It Together</strong> — We'll apply everything you've learned to a completely different nonprofit (LEAP) and show you how to ask the right questions about any nonprofit's finances.
+                        </p>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
+                                window.location.href = 'NFP-Tutorial-6-Putting-It-Together.html';
+                            }}
+                            style={{
+                                backgroundColor: colors.primary,
+                                color: 'white',
+                                border: 'none',
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            → Next Tutorial
+                        </button>
+                        <button
+                            onClick={handleRestartClick}
+                            style={{
+                                backgroundColor: colors.sand,
+                                color: colors.primary,
+                                border: `1px solid ${colors.primary}`,
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            Restart Tutorial
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Render current phase
+            const renderPhase = () => {
+                switch (phase) {
+                    case 'welcome':
+                        return <WelcomePhase />;
+                    case 'phase1':
+                        return <Phase1 />;
+                    case 'phase2':
+                        return <Phase2 />;
+                    case 'phase3':
+                        return <Phase3 />;
+                    case 'phase4':
+                        return <Phase4 />;
+                    case 'phase5':
+                        return <Phase5 />;
+                    case 'phase6':
+                        return <Phase6 />;
+                    case 'complete':
+                        return <CompletePhase />;
+                    default:
+                        return <WelcomePhase />;
+                }
+            };
+
+            return (
+                <div style={{ backgroundColor: colors.sand, minHeight: '100vh', fontFamily: 'inherit' }}>
+                    <Header />
+                    <GlossaryModal />
+                    <SoundToggle />
+                    {renderPhase()}
+                    <div style={{ height: '40px' }} />
+                </div>
+            );
+        };
+
+        // Render the app
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<NFPTutorial5 />);
+    </script>
+</body>
+</html>
