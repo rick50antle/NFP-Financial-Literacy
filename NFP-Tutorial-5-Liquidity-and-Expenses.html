@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tutorial 5: Liquidity & Expenses - Yale NFP Financial Literacy</title>
+    <title>Liquidity & Expenses - NFP Financial Literacy</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -71,6 +71,7 @@
             const [headerClickCount, setHeaderClickCount] = useState(0);
             const [answers, setAnswers] = useState({});
             const [glossaryOpen, setGlossaryOpen] = useState(false);
+            const [aiTransparencyOpen, setAiTransparencyOpen] = useState(false);
 
             const colors = {
                 primary: '#00356b',
@@ -158,7 +159,8 @@
                     setHints(prev => ({ ...prev, q1_2: true }));
                     playBuzzer();
                 } else {
-                    playSoftNope();
+                    playBuzzer();
+                    setAnswers(prev => ({ ...prev, q1: 'B' }));
                 }
                 setAnswers({ ...answers, q1: choice });
             };
@@ -174,7 +176,8 @@
                         setHints(prev => ({ ...prev, q2_2: true }));
                         playBuzzer();
                     } else {
-                        playSoftNope();
+                        playBuzzer();
+                        setAnswers(prev => ({ ...prev, q2: '19' }));
                     }
                 } else if (value && isCorrect) {
                     playSuccessTone();
@@ -183,7 +186,13 @@
             };
 
             const handleQ3 = (value) => {
-                setAnswers({ ...answers, q3: value });
+                setAnswers(prev => ({ ...prev, q3: value }));
+            };
+            const submitQ3 = () => {
+                if (answers.q3 && answers.q3.trim().length > 0) {
+                    playSuccessTone();
+                    setHints(prev => ({ ...prev, q3_submitted: true }));
+                }
             };
 
             const handleQ4 = (value) => {
@@ -197,7 +206,8 @@
                         setHints(prev => ({ ...prev, q4_2: true }));
                         playBuzzer();
                     } else {
-                        playSoftNope();
+                        playBuzzer();
+                        setAnswers(prev => ({ ...prev, q4: '80' }));
                     }
                 } else if (value && isCorrect) {
                     playSuccessTone();
@@ -215,7 +225,8 @@
                     setHints(prev => ({ ...prev, q5_2: true }));
                     playBuzzer();
                 } else {
-                    playSoftNope();
+                    playBuzzer();
+                    setAnswers(prev => ({ ...prev, q5: 'B' }));
                 }
                 setAnswers({ ...answers, q5: choice });
             };
@@ -230,7 +241,8 @@
                     setHints(prev => ({ ...prev, q6_2: true }));
                     playBuzzer();
                 } else {
-                    playSoftNope();
+                    playBuzzer();
+                    setAnswers(prev => ({ ...prev, q6: 'B' }));
                 }
                 setAnswers({ ...answers, q6: choice });
             };
@@ -289,9 +301,28 @@
                                     }}
                                     title="Triple-click to toggle dev mode"
                                 >
-                                    Tutorial 5: Liquidity & Expenses
+                                    Liquidity & Expenses
                                 </h1>
                                 <div style={{ display: 'flex', gap: '8px' }}>
+                                    <button
+                                        onClick={() => {
+                                            playContinueClick();
+                                            window.location.href = 'index.html';
+                                        }}
+                                        style={{
+                                            background: 'rgba(255,255,255,0.2)',
+                                            color: 'white',
+                                            border: 'none',
+                                            padding: '8px 12px',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            fontSize: '16px',
+                                            fontWeight: 'bold',
+                                        }}
+                                        title="Home"
+                                    >
+                                        🏠
+                                    </button>
                                     <button
                                         onClick={() => {
                                             playContinueClick();
@@ -442,10 +473,7 @@
             );
 
             // Welcome Phase
-            const WelcomePhase = () => {
-                const [aiTransparencyOpen, setAiTransparencyOpen] = useState(false);
-
-                return (
+            const WelcomePhase = () => (
                     <div style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px' }}>
                         <div style={{ backgroundColor: colors.sand, padding: '32px', borderRadius: '8px', marginBottom: '24px' }}>
                             <h2 style={{ color: colors.primary, marginTop: 0 }}>Welcome to Tutorial 5</h2>
@@ -520,8 +548,7 @@
                             Begin: Liquidity Footnote
                         </button>
                     </div>
-                );
-            };
+            );
 
             // Phase 1: Understanding Liquidity
             const Phase1 = () => (
@@ -849,7 +876,7 @@
                         <textarea
                             value={answers.q3 || ''}
                             onChange={(e) => handleQ3(e.target.value)}
-                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleQ3(e.target.value); } }}
+                            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submitQ3(); } }}
                             placeholder="Type your answer..."
                             style={{
                                 width: '100%',
@@ -863,8 +890,27 @@
                                 resize: 'vertical',
                             }}
                         />
+                        {!hints.q3_submitted && (
+                            <button
+                                onClick={submitQ3}
+                                disabled={!answers.q3 || answers.q3.trim().length === 0}
+                                style={{
+                                    marginTop: '12px',
+                                    backgroundColor: (answers.q3 && answers.q3.trim().length > 0) ? colors.primary : colors.earth,
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '10px 20px',
+                                    borderRadius: '4px',
+                                    cursor: (answers.q3 && answers.q3.trim().length > 0) ? 'pointer' : 'not-allowed',
+                                    fontWeight: 'bold',
+                                    fontSize: '14px',
+                                }}
+                            >
+                                Submit Answer
+                            </button>
+                        )}
 
-                        {answers.q3 && (
+                        {hints.q3_submitted && (
                             <div style={{
                                 marginTop: '16px',
                                 backgroundColor: colors.successBg,
@@ -926,7 +972,7 @@
                         <p style={{ fontSize: '14px', color: colors.earthDark }}>
                             The Statement of Functional Expenses is unique to nonprofits. It shows how total expenses are divided between:
                         </p>
-                        <ul style={{ fontSize: '14px', color: colors.earthDark', marginTop: '12px' }}>
+                        <ul style={{ fontSize: '14px', color: colors.earthDark, marginTop: '12px' }}>
                             <li><strong>Program Services</strong> — activities that fulfill the mission</li>
                             <li><strong>Supporting Services</strong> — management & general, and fundraising</li>
                         </ul>
@@ -1425,6 +1471,23 @@
                         <button
                             onClick={() => {
                                 playContinueClick();
+                                window.location.href = 'NFP-Tutorial-4-Cash-Flows.html';
+                            }}
+                            style={{
+                                backgroundColor: colors.sand,
+                                color: colors.primary,
+                                border: `1px solid ${colors.primary}`,
+                                padding: '12px 24px',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                            }}
+                        >
+                            ← Previous Tutorial
+                        </button>
+                        <button
+                            onClick={() => {
+                                playContinueClick();
                                 window.location.href = 'NFP-Tutorial-6-Putting-It-Together.html';
                             }}
                             style={{
@@ -1461,23 +1524,23 @@
             const renderPhase = () => {
                 switch (phase) {
                     case 'welcome':
-                        return <WelcomePhase />;
+                        return WelcomePhase();
                     case 'phase1':
-                        return <Phase1 />;
+                        return Phase1();
                     case 'phase2':
-                        return <Phase2 />;
+                        return Phase2();
                     case 'phase3':
-                        return <Phase3 />;
+                        return Phase3();
                     case 'phase4':
-                        return <Phase4 />;
+                        return Phase4();
                     case 'phase5':
-                        return <Phase5 />;
+                        return Phase5();
                     case 'phase6':
-                        return <Phase6 />;
+                        return Phase6();
                     case 'complete':
-                        return <CompletePhase />;
+                        return CompletePhase();
                     default:
-                        return <WelcomePhase />;
+                        return WelcomePhase();
                 }
             };
 

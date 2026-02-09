@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tutorial 1: Statement of Financial Position</title>
+  <title>Statement of Financial Position - NFP Financial Literacy</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     * {
@@ -176,7 +176,7 @@
               onClick={handleHeaderClick}
               style={{ margin: '0 0 8px 0', fontSize: '28px', cursor: 'pointer', userSelect: 'none' }}
             >
-              Tutorial 1: Statement of Financial Position
+              Statement of Financial Position
             </h1>
             <p style={{ margin: '0 0 15px 0', fontSize: '14px', opacity: 0.9 }}>
               Yale School of Management • NFP Financial Literacy
@@ -195,6 +195,25 @@
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={() => { window.location.href = 'index.html'; }}
+                  style={{
+                    background: colors.accent,
+                    border: 'none',
+                    color: colors.primary,
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '20px',
+                  }}
+                  title="Home"
+                >
+                  🏠
+                </button>
                 <button
                   onClick={() => setShowGlossary(!showGlossary)}
                   style={{
@@ -326,11 +345,11 @@
           }
         };
 
-        if (answered) {
+        if (answered || getHintCount('q1') >= 3) {
           return (
             <>
               <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
-                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct! $106,388,737</p>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>{answered ? 'Correct!' : 'Answer:'} $106,388,737</p>
                 <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
                   Net Assets is the DEFINITIONAL difference between recorded assets and recorded liabilities. It's not a pool of money you can see or touch — it's a mathematical residual that tells you what's left over after you account for what you owe.
                 </p>
@@ -396,11 +415,11 @@
           }
         };
 
-        if (answered) {
+        if (answered || getHintCount('q2') >= 3) {
           return (
             <>
               <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
-                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct!</p>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>{answered ? 'Correct!' : 'Answer:'}</p>
                 <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
                   Unlike for-profit equities, Net Assets doesn't represent ownership. It's a DEFINITIONAL residual — the name given to the difference between recorded assets and liabilities. It tracks whether contributions came with donor restrictions.
                 </p>
@@ -462,11 +481,11 @@
           }
         };
 
-        if (answered) {
+        if (answered || getHintCount('q3') >= 3) {
           return (
             <>
               <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
-                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct! About 6%</p>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>{answered ? 'Correct!' : 'Answer:'} About 6%</p>
                 <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
                   Only about 6% of OHS's assets are financed by liabilities. That means 94% is funded by net assets — contributions and accumulated surpluses over the organization's lifetime. This is common for established nonprofits.
                 </p>
@@ -532,11 +551,11 @@
           }
         };
 
-        if (answered) {
+        if (answered || getHintCount('q4') >= 3) {
           return (
             <>
               <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
-                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct!</p>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>{answered ? 'Correct!' : 'Answer:'}</p>
                 <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
                   This is one of the most important things to understand about nonprofit financial statements. Net Assets Without Donor Restrictions tells you these contributions didn't come with donor strings attached. But $62.6 million of that is tied up in buildings and land — you can't spend buildings. The net asset category tells you about RESTRICTION STATUS, not LIQUIDITY.
                 </p>
@@ -596,11 +615,11 @@
           }
         };
 
-        if (answered) {
+        if (answered || getHintCount('q5') >= 3) {
           return (
             <>
               <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
-                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Great thinking!</p>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>{answered ? 'Great thinking!' : 'Answer:'}</p>
                 <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
                   Accounting is a human-created information system, not a mirror of economic reality. OHS's recorded assets of $112.8 million exclude valuable things like its volunteer network, brand reputation, donor relationships, and staff expertise — all real economic resources that can't be reliably quantified under accounting rules.
                 </p>
@@ -977,6 +996,21 @@
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => window.location.href = 'NFP-Tutorial-0-Overview.html'}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: colors.primary,
+                    border: `2px solid ${colors.earthLight}`,
+                    padding: '10px 26px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  ← Previous Tutorial
+                </button>
                 <button
                   onClick={() => window.location.href = 'NFP-Tutorial-2-Net-Asset-Categories.html'}
                   style={{

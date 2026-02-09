@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rick2.0 - Tutorial 3: Statement of Activities</title>
+  <title>The Statement of Activities - NFP Financial Literacy</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * {
@@ -800,10 +800,12 @@
         if (q1Hints < 3 && !q1Complete) {
           if (q1Hints === 2) {
             playBuzzer();
+            setQ1Hints(3);
+            setQ1Complete(true);
           } else {
             playSoftNope();
+            setQ1Hints(q1Hints + 1);
           }
-          setQ1Hints(q1Hints + 1);
         }
       };
 
@@ -823,11 +825,14 @@
         } else if (q2Hints < 3) {
           if (q2Hints === 2) {
             playBuzzer();
+            setQ2Hints(3);
+            setQ2Complete(true);
+            setQ2Feedback('Not quite. The answer is shown below.');
           } else {
             playSoftNope();
+            setQ2Hints(q2Hints + 1);
+            setQ2Feedback('Not quite. Check the hints below.');
           }
-          setQ2Hints(q2Hints + 1);
-          setQ2Feedback('Not quite. Check the hints below.');
         } else {
           playSoftNope();
           setQ2Feedback('Not quite. The answer is shown below.');
@@ -838,10 +843,12 @@
         if (q2Hints < 3 && !q2Complete) {
           if (q2Hints === 2) {
             playBuzzer();
+            setQ2Hints(3);
+            setQ2Complete(true);
           } else {
             playSoftNope();
+            setQ2Hints(q2Hints + 1);
           }
-          setQ2Hints(q2Hints + 1);
         }
       };
 
@@ -867,10 +874,12 @@
         if (q3Hints < 3 && !q3Complete) {
           if (q3Hints === 2) {
             playBuzzer();
+            setQ3Hints(3);
+            setQ3Complete(true);
           } else {
             playSoftNope();
+            setQ3Hints(q3Hints + 1);
           }
-          setQ3Hints(q3Hints + 1);
         }
       };
 
@@ -896,10 +905,12 @@
         if (q4Hints < 3 && !q4Complete) {
           if (q4Hints === 2) {
             playBuzzer();
+            setQ4Hints(3);
+            setQ4Complete(true);
           } else {
             playSoftNope();
+            setQ4Hints(q4Hints + 1);
           }
-          setQ4Hints(q4Hints + 1);
         }
       };
 
@@ -981,10 +992,16 @@
             <div>
               <div className="header-top">
                 <div className="header-title" onClick={handleTripleClick}>
-                  <h1>Rick2.0</h1>
+                  <h1>The Statement of Activities</h1>
                   <p>Yale School of Management • NFP Financial Literacy</p>
                 </div>
                 <div className="header-buttons">
+                  <button
+                    className="btn-accent"
+                    onClick={() => window.location.href = 'index.html'}
+                  >
+                    🏠 Home
+                  </button>
                   <button
                     className="btn-accent"
                     onClick={() => setGlossaryOpen(!glossaryOpen)}
@@ -1652,6 +1669,11 @@
                 </div>
 
                 <div className="complete-buttons">
+                  <a href="NFP-Tutorial-2-Net-Asset-Categories.html" style={{ textDecoration: 'none' }}>
+                    <button className="complete-btn">
+                      ← Previous Tutorial
+                    </button>
+                  </a>
                   <a href="NFP-Tutorial-4-Cash-Flows.html" style={{ textDecoration: 'none' }}>
                     <button className="complete-btn accent">
                       → Next Tutorial

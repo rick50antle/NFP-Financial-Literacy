@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NFP Tutorial 4: Statement of Cash Flows</title>
+  <title>The Statement of Cash Flows - NFP Financial Literacy</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 
   <style>
@@ -443,6 +443,7 @@
           playSoftNope();
         } else if (!hintsUsed[`${qKey}-2`]) {
           setHintsUsed(prev => ({ ...prev, [`${qKey}-2`]: true }));
+          setAnswers(prev => ({ ...prev, [qKey]: q.correct }));
           playBuzzer();
         } else {
           playSoftNope();
@@ -456,6 +457,7 @@
 
         if (newHintsUsed[key]) {
           if (hintIdx === 2) {
+            setAnswers(prev => ({ ...prev, [qKey]: questions[qKey].correct }));
             playBuzzer();
           } else {
             playSoftNope();
@@ -928,6 +930,25 @@
 
                 {/* Next Tutorial Button */}
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+                  <a
+                    href="NFP-Tutorial-3-Statement-of-Activities.html"
+                    style={{
+                      padding: '0.75rem 1.5rem',
+                      fontSize: '1rem',
+                      backgroundColor: colors.sand,
+                      color: colors.primary,
+                      border: `2px solid ${colors.earth}`,
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontWeight: '600',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                    }}
+                  >
+                    ← Previous Tutorial
+                  </a>
                   <button
                     onClick={handleRestart}
                     style={{
@@ -987,83 +1008,72 @@
           {/* Header */}
           <div
             style={{
-              maxWidth: '900px',
-              margin: '0 auto 2rem',
-              borderBottom: `2px solid ${colors.earth}`,
-              paddingBottom: '1rem',
+              backgroundColor: colors.primary,
+              padding: '20px',
+              color: 'white',
+              marginBottom: '2rem',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <h1
-                style={{ margin: 0, color: colors.primary, fontSize: '1.5rem', cursor: 'pointer', userSelect: 'none' }}
-                onClick={handleHeaderClick}
-                title="Triple-click for dev mode"
-              >
-                Rick2.0
-              </h1>
-              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <button
-                  onClick={() => setGlossaryModalOpen(true)}
-                  style={{
-                    backgroundColor: 'transparent',
-                    border: 'none',
-                    fontSize: '1.5rem',
-                    cursor: 'pointer',
-                    padding: 0,
-                  }}
-                  title="Open Glossary"
-                >
-                  📖
-                </button>
-                <button
-                  onClick={handleRestart}
-                  style={{
-                    backgroundColor: 'transparent',
-                    border: 'none',
-                    fontSize: '1.5rem',
-                    cursor: 'pointer',
-                    padding: 0,
-                  }}
-                  title="Restart Tutorial"
-                >
-                  ↺
-                </button>
-              </div>
-            </div>
-            <p style={{ margin: '0 0 1rem 0', fontSize: '0.95rem', color: colors.earthDark }}>
+            <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+            <h1
+              style={{ margin: '0 0 8px 0', fontSize: '28px', cursor: 'pointer', userSelect: 'none' }}
+              onClick={handleHeaderClick}
+              title="Triple-click for dev mode"
+            >
+              The Statement of Cash Flows
+            </h1>
+            <p style={{ margin: '0 0 15px 0', fontSize: '14px', opacity: 0.9 }}>
               Yale School of Management • NFP Financial Literacy
             </p>
-
-            {/* Progress Bar */}
-            <div style={{ backgroundColor: colors.earthLight, borderRadius: '4px', height: '6px', overflow: 'hidden', marginBottom: devMode ? '1rem' : '0' }}>
-              <div
-                style={{
-                  backgroundColor: colors.accent,
-                  height: '100%',
-                  width: `${getProgressPercentage()}%`,
-                  transition: 'width 0.3s ease',
-                }}
-              />
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: devMode ? '15px' : '0' }}>
+              <div style={{ flex: 1, marginRight: '20px' }}>
+                <div style={{ height: '8px', backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: '4px', overflow: 'hidden' }}>
+                  <div
+                    style={{
+                      backgroundColor: colors.accent,
+                      height: '100%',
+                      width: `${getProgressPercentage()}%`,
+                      transition: 'width 0.3s ease',
+                    }}
+                  />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => window.location.href = 'index.html'}
+                  style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.3)', backgroundColor: 'transparent', color: 'white', fontSize: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Home"
+                >🏠</button>
+                <button
+                  onClick={() => setGlossaryModalOpen(true)}
+                  style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.3)', backgroundColor: 'transparent', color: 'white', fontSize: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Open Glossary"
+                >📖</button>
+                <button
+                  onClick={handleRestart}
+                  style={{ width: '36px', height: '36px', borderRadius: '50%', border: '1px solid rgba(255,255,255,0.3)', backgroundColor: 'transparent', color: 'white', fontSize: '16px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                  title="Restart Tutorial"
+                >↺</button>
+              </div>
             </div>
-
             {/* Dev Mode Phase Skip Buttons */}
             {devMode && (
-              <div style={{ marginTop: '1rem', padding: '0.75rem', backgroundColor: 'rgba(220,38,38,0.1)', borderRadius: '6px' }}>
-                <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.85rem', fontWeight: 'bold', color: colors.error }}>Dev Mode: Skip to phase</p>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <div style={{ marginTop: '15px', padding: '10px', backgroundColor: 'rgba(220,38,38,0.15)', borderRadius: '6px' }}>
+                <p style={{ margin: '0 0 8px 0', fontSize: '12px', fontWeight: 'bold', color: '#fca5a5' }}>Dev Mode: Skip to phase</p>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                   {['welcome', 'phase1', 'phase2', 'phase3', 'phase4', 'phase5', 'complete'].map(p => (
                     <button
                       key={p}
                       onClick={() => { setPhase(p); setAnswers({}); setHintsUsed({}); }}
                       style={{
-                        padding: '0.4rem 0.8rem',
-                        fontSize: '0.8rem',
+                        padding: '4px 10px',
+                        fontSize: '11px',
                         fontWeight: 'bold',
                         border: 'none',
                         borderRadius: '4px',
                         cursor: 'pointer',
-                        backgroundColor: p === phase ? colors.accent : 'rgba(0,0,0,0.1)',
-                        color: p === phase ? '#fff' : colors.error,
+                        backgroundColor: p === phase ? colors.accent : 'rgba(255,255,255,0.15)',
+                        color: p === phase ? '#fff' : '#fca5a5',
                       }}
                     >
                       {p}
@@ -1072,6 +1082,7 @@
                 </div>
               </div>
             )}
+          </div>
           </div>
 
           {/* Main Content */}

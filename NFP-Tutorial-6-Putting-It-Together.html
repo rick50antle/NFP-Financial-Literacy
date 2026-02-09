@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NFP Tutorial 6: Putting It Together</title>
+  <title>Putting It Together - NFP Financial Literacy</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
@@ -153,7 +153,7 @@
               onClick={handleHeaderClick}
               style={{ margin: '0 0 8px 0', fontSize: '28px', cursor: 'pointer', userSelect: 'none' }}
             >
-              Tutorial 6: Putting It Together
+              Putting It Together
             </h1>
             <p style={{ margin: '0 0 15px 0', fontSize: '14px', opacity: 0.9 }}>
               Yale School of Management • NFP Financial Literacy
@@ -174,6 +174,25 @@
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={() => { window.location.href = 'index.html'; }}
+                  style={{
+                    background: colors.accent,
+                    border: 'none',
+                    color: colors.primary,
+                    width: '40px',
+                    height: '40px',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '20px',
+                  }}
+                  title="Home"
+                >
+                  🏠
+                </button>
                 <button
                   onClick={() => setShowGlossary(!showGlossary)}
                   style={{
@@ -309,11 +328,11 @@
           }
         };
 
-        if (answered) {
+        if (answered || getHintCount('q1') >= 3) {
           return (
             <>
               <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
-                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct! $6,866,348</p>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>{answered ? 'Correct! $6,866,348' : 'Answer: $6,866,348'}</p>
                 <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
                   LEAP's Net Assets are $6,866,348 — much smaller than OHS's $106.4 million. LEAP is a much smaller organization. But size alone doesn't tell you about the financial profile — let's dig deeper.
                 </p>
@@ -383,11 +402,11 @@
           }
         };
 
-        if (answered) {
+        if (answered || getHintCount('q2') >= 3) {
           return (
             <>
               <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
-                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct! About 84%</p>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>{answered ? 'Correct! About 84%' : 'Answer: About 84%'}</p>
                 <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
                   About 84% — almost identical to OHS's 82%! Both organizations have very similar percentages of unrestricted net assets. But as you'll see, the similarity ends there.
                 </p>
@@ -453,11 +472,11 @@
           }
         };
 
-        if (answered) {
+        if (answered || getHintCount('q3') >= 3) {
           return (
             <>
               <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
-                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct!</p>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>{answered ? 'Correct!' : 'Answer:'}</p>
                 <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
                   This is the power of looking beyond percentages. LEAP is a cash-heavy organization — nearly 70% of its assets are cash. OHS has a massive property base ($62.6M in buildings/land) with only 3.5% in cash. Both are ~82-84% "unrestricted," but the underlying assets are completely different. The net asset CATEGORY is the same; the financial REALITY is completely different.
                 </p>
@@ -498,7 +517,7 @@
                 'Think about what OHS\'s assets are made of — $62.6 million in buildings and land.',
                 'LEAP\'s assets are mostly cash. OHS\'s assets are mostly property. Same "unrestricted" percentage, completely different financial reality.',
               ]}
-              explanation="This is the power of looking beyond percentages. LEAP is a cash-heavy organization — nearly 70% of its assets are cash. OHS has a massive property base ($62.6M in buildings/land) with only 3.5% in cash. Both are ~82-84% "unrestricted," but the underlying assets are completely different. The net asset CATEGORY is the same; the financial REALITY is completely different."
+              explanation={'This is the power of looking beyond percentages. LEAP is a cash-heavy organization — nearly 70% of its assets are cash. OHS has a massive property base ($62.6M in buildings/land) with only 3.5% in cash. Both are ~82-84% "unrestricted," but the underlying assets are completely different. The net asset CATEGORY is the same; the financial REALITY is completely different.'}
             />
           </>
         );
@@ -516,11 +535,11 @@
           }
         };
 
-        if (answered) {
+        if (answered || getHintCount('q4') >= 3) {
           return (
             <>
               <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
-                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Correct!</p>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>{answered ? 'Correct!' : 'Answer:'}</p>
                 <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
                   Both amounts are board designations — internal statements of intent, not binding restrictions. Both remain classified as Without Donor Restrictions because only donors can create binding restrictions. LEAP's $900K designation and OHS's $13.3M designation are different in scale but identical in nature: the respective boards expressed an intention but can change their minds.
                 </p>
@@ -580,11 +599,11 @@
           }
         };
 
-        if (answered) {
+        if (answered || getHintCount('q5') >= 3) {
           return (
             <>
               <div style={{ marginTop: '16px', padding: '12px', backgroundColor: colors.successBg, borderRadius: '6px' }}>
-                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>Excellent thinking!</p>
+                <p style={{ color: colors.success, fontWeight: 'bold', margin: '0 0 8px 0' }}>{answered ? 'Excellent thinking!' : 'Answer:'}</p>
                 <p style={{ margin: 0, fontSize: '14px', color: colors.earthDark }}>
                   This is the central lesson of the entire tutorial series. OHS and LEAP both show ~82-84% unrestricted net assets, but their financial realities are completely different. Understanding financial statements means looking beyond the percentages to understand what the numbers actually represent — what the assets ARE, how liquid they are, and what constraints exist.
                 </p>
@@ -1006,6 +1025,21 @@
               </div>
 
               <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => { window.location.href = 'NFP-Tutorial-5-Liquidity-and-Expenses.html'; playContinueClick(); }}
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: colors.primary,
+                    border: `2px solid ${colors.earthLight}`,
+                    padding: '12px 28px',
+                    fontSize: '16px',
+                    fontWeight: 'bold',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  ← Previous Tutorial
+                </button>
                 <button
                   onClick={() => { window.location.href = 'index.html'; playContinueClick(); }}
                   style={{
